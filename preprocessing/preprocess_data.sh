@@ -111,7 +111,12 @@ sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.
 
 # Use dilated mask to crop the orginal image and manual MS segmentations
 sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
+
+# TODO: aggregate multiple raters
+
 # TODO: crop the manual segs
+
+# TODO: Create 'clean' output folder
 
 
 # Display useful info for the log
