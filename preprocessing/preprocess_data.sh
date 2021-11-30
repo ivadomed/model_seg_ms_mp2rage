@@ -29,6 +29,35 @@ set -e -o pipefail
 # Exit if user presses CTRL+C (Linux) or CMD+C (OSX)
 trap "echo Caught Keyboard Interrupt within script. Exiting now.; exit" INT
 
+
+# CONVENIENCE FUNCTIONS
+# ======================================================================================================================
+
+segment_if_does_not_exist() {
+  ###
+  #  This function checks if a manual spinal cord segmentation file already exists, then:
+  #    - If it does, copy it locally.
+  #    - If it doesn't, perform automatic spinal cord segmentation.
+  #  This allows you to add manual segmentations on a subject-by-subject basis without disrupting the pipeline.
+  ###
+  local file="$1"
+  local contrast="$2"
+  # Update global variable with segmentation file name
+  FILESEG="${file}_seg"
+  FILESEGMANUAL="${PATH_DATA}/derivatives/labels/${SUBJECT}/anat/${FILESEG}-manual.nii.gz"
+  echo
+  echo "Looking for manual segmentation: $FILESEGMANUAL"
+  if [[ -e $FILESEGMANUAL ]]; then
+    echo "Found! Using manual segmentation."
+    rsync -avzh $FILESEGMANUAL ${FILESEG}.nii.gz
+    sct_qc -i ${file}.nii.gz -s ${FILESEG}.nii.gz -p sct_deepseg_sc -qc ${PATH_QC} -qc-subject ${SUBJECT}
+  else
+    echo "Not found. Proceeding with automatic segmentation."
+    # Segment spinal cord
+    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -qc ${PATH_QC} -qc-subject ${SUBJECT}
+  fi
+}
+
 # Retrieve input params and other params
 SUBJECT=$1
 
@@ -61,47 +90,51 @@ fi
 # Copy source images
 rsync -avzh $PATH_DATA/$SUBJECT .
 
-# Copy segmentation GTs
+# Copy segmentation ground truths (GT)
 mkdir -p derivatives/labels
 rsync -avzh $PATH_DATA/derivatives/labels/$SUBJECT derivatives/labels/.
 
-# (1) Go to subject folder for source images
+# Go to subject folder for source images
 cd ${SUBJECT}
 
-# TODO: re-think how file variable is defined-- not clean to have folders in there
+# Define variables
 file_onlyfile="${SUBJECT}_UNIT1"
 file="anat/${SUBJECT}_UNIT1"
 
-# Spinal cord extraction
-sct_deepseg_sc -i ${file}.nii.gz -c t1 -o ${file_onlyfile}_seg.nii.gz
+# Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
+# specify t1 contrast because the cord is bright and the CSF is dark (like on 
+# the traditional MPRAGE T1w data).
+segment_if_does_not_exist ${file} t1
+file_seg="${FILESEG}"
 
-# Dilate spinal cord mask
-sct_maths -i ${file_onlyfile}_seg.nii.gz -dilate 5 -shape ball -o ${file_onlyfile}_seg_dilate.nii.gz
-
-# Compute the bounding box coordinates of SC mask for cropping the VOI
-# NOTE: `fslstats -w returns the smallest ROI <xmin> <xsize> <ymin> <ysize> <zmin> <zsize> <tmin> <tsize> containing nonzero voxels
-bbox_coords=$(fslstats "${file_onlyfile}"_seg_dilate.nii.gz -w)
-
-# Apply the SC mask to the final forms of both sessions
-fslmaths ${file}.nii.gz -mas ${file_onlyfile}_seg_dilate.nii.gz ${file_onlyfile}_masked.nii.gz
-
-# Crop the VOI based on SC mask to minimize the input image size
-fslroi ${file_onlyfile}_masked.nii.gz ${file_onlyfile}_masked.nii.gz $bbox_coords
-
-# (2) Go to subject folder for segmentation GTs
-cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT
-
-file_gt_onlyfile="${SUBJECT}_UNIT1_lesion-manual"
-file_gt="anat/${SUBJECT}_UNIT1_lesion-manual"
-
-# Apply the SC mask to the final forms of all segmentation GTs
-fslmaths ${file_gt}.nii.gz -mas $PATH_DATA_PROCESSED/$SUBJECT/${file_onlyfile}_seg_dilate.nii.gz ${file_gt_onlyfile}_masked.nii.gz
-
-# Crop the VOI based on SC mask to minimize the GT image size
-fslroi ${file_gt_onlyfile}_masked.nii.gz ${file_gt_onlyfile}_masked.nii.gz $bbox_coords
-
-# Go back to parent folder (i.e. get ready for next subject call!)
-cd $PATH_DATA_PROCESSED
+# 
+# # Dilate spinal cord mask
+# sct_maths -i ${file_onlyfile}_seg.nii.gz -dilate 5 -shape ball -o ${file_onlyfile}_seg_dilate.nii.gz
+# 
+# # Compute the bounding box coordinates of SC mask for cropping the VOI
+# # NOTE: `fslstats -w returns the smallest ROI <xmin> <xsize> <ymin> <ysize> <zmin> <zsize> <tmin> <tsize> containing nonzero voxels
+# bbox_coords=$(fslstats "${file_onlyfile}"_seg_dilate.nii.gz -w)
+# 
+# # Apply the SC mask to the final forms of both sessions
+# fslmaths ${file}.nii.gz -mas ${file_onlyfile}_seg_dilate.nii.gz ${file_onlyfile}_masked.nii.gz
+# 
+# # Crop the VOI based on SC mask to minimize the input image size
+# fslroi ${file_onlyfile}_masked.nii.gz ${file_onlyfile}_masked.nii.gz $bbox_coords
+# 
+# # (2) Go to subject folder for segmentation GTs
+# cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT
+# 
+# file_gt_onlyfile="${SUBJECT}_UNIT1_lesion-manual"
+# file_gt="anat/${SUBJECT}_UNIT1_lesion-manual"
+# 
+# # Apply the SC mask to the final forms of all segmentation GTs
+# fslmaths ${file_gt}.nii.gz -mas $PATH_DATA_PROCESSED/$SUBJECT/${file_onlyfile}_seg_dilate.nii.gz ${file_gt_onlyfile}_masked.nii.gz
+# 
+# # Crop the VOI based on SC mask to minimize the GT image size
+# fslroi ${file_gt_onlyfile}_masked.nii.gz ${file_gt_onlyfile}_masked.nii.gz $bbox_coords
+# 
+# # Go back to parent folder (i.e. get ready for next subject call!)
+# cd $PATH_DATA_PROCESSED
 
 # Display useful info for the log
 end=`date +%s`
