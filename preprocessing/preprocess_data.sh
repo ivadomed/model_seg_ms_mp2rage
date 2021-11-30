@@ -107,32 +107,12 @@ segment_if_does_not_exist ${file} t1
 file_seg="${FILESEG}"
 
 # Dilate spinal cord mask
-sct_maths -i ${file_onlyfile}_seg.nii.gz -dilate 5 -shape ball -o ${file_onlyfile}_seg_dilate.nii.gz
-# 
-# # Compute the bounding box coordinates of SC mask for cropping the VOI
-# # NOTE: `fslstats -w returns the smallest ROI <xmin> <xsize> <ymin> <ysize> <zmin> <zsize> <tmin> <tsize> containing nonzero voxels
-# bbox_coords=$(fslstats "${file_onlyfile}"_seg_dilate.nii.gz -w)
-# 
-# # Apply the SC mask to the final forms of both sessions
-# fslmaths ${file}.nii.gz -mas ${file_onlyfile}_seg_dilate.nii.gz ${file_onlyfile}_masked.nii.gz
-# 
-# # Crop the VOI based on SC mask to minimize the input image size
-# fslroi ${file_onlyfile}_masked.nii.gz ${file_onlyfile}_masked.nii.gz $bbox_coords
-# 
-# # (2) Go to subject folder for segmentation GTs
-# cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT
-# 
-# file_gt_onlyfile="${SUBJECT}_UNIT1_lesion-manual"
-# file_gt="anat/${SUBJECT}_UNIT1_lesion-manual"
-# 
-# # Apply the SC mask to the final forms of all segmentation GTs
-# fslmaths ${file_gt}.nii.gz -mas $PATH_DATA_PROCESSED/$SUBJECT/${file_onlyfile}_seg_dilate.nii.gz ${file_gt_onlyfile}_masked.nii.gz
-# 
-# # Crop the VOI based on SC mask to minimize the GT image size
-# fslroi ${file_gt_onlyfile}_masked.nii.gz ${file_gt_onlyfile}_masked.nii.gz $bbox_coords
-# 
-# # Go back to parent folder (i.e. get ready for next subject call!)
-# cd $PATH_DATA_PROCESSED
+sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.gz
+
+# Use dilated mask to crop the orginal image and manual MS segmentations
+sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
+# TODO: crop the manual segs
+
 
 # Display useful info for the log
 end=`date +%s`
