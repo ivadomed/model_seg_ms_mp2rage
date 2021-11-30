@@ -54,7 +54,7 @@ segment_if_does_not_exist() {
   else
     echo "Not found. Proceeding with automatic segmentation."
     # Segment spinal cord
-    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
   fi
 }
 
@@ -95,11 +95,10 @@ mkdir -p derivatives/labels
 rsync -avzh $PATH_DATA/derivatives/labels/$SUBJECT derivatives/labels/.
 
 # Go to subject folder for source images
-cd ${SUBJECT}
+cd ${SUBJECT}/anat
 
 # Define variables
-file_onlyfile="${SUBJECT}_UNIT1"
-file="anat/${SUBJECT}_UNIT1"
+file="${SUBJECT}_UNIT1"
 
 # Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
 # specify t1 contrast because the cord is bright and the CSF is dark (like on 
@@ -107,9 +106,8 @@ file="anat/${SUBJECT}_UNIT1"
 segment_if_does_not_exist ${file} t1
 file_seg="${FILESEG}"
 
-# 
-# # Dilate spinal cord mask
-# sct_maths -i ${file_onlyfile}_seg.nii.gz -dilate 5 -shape ball -o ${file_onlyfile}_seg_dilate.nii.gz
+# Dilate spinal cord mask
+sct_maths -i ${file_onlyfile}_seg.nii.gz -dilate 5 -shape ball -o ${file_onlyfile}_seg_dilate.nii.gz
 # 
 # # Compute the bounding box coordinates of SC mask for cropping the VOI
 # # NOTE: `fslstats -w returns the smallest ROI <xmin> <xsize> <ymin> <ysize> <zmin> <zsize> <tmin> <tsize> containing nonzero voxels
