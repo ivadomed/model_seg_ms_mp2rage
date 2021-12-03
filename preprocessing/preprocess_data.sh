@@ -117,8 +117,8 @@ cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
 
 # Define variables
 # TODO: Check if multiple rater filenames are correct or not
-file_gt1="${SUBJECT}_UNIT1_lesion-manual-rater1"
-file_gt2="${SUBJECT}_UNIT1_lesion-manual-rater2"
+file_gt1="${SUBJECT}_UNIT1_lesion-manual"
+file_gt2="${SUBJECT}_UNIT1_lesion-manual2"
 file_gtc="${SUBJECT}_UNIT1_lesion-manual-majvote"
 file_soft="${SUBJECT}_UNIT1_lesion-manual-soft"
 # 'c' stands for the consensus GT
