@@ -130,7 +130,7 @@ file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 # TODO: if second rater missing, this will break. We need to accommodate.
 sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
 sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
-# binarize: everything that is below 1 becomes 0, the rest is one.
+# binarize: everything that is 0.5 and below 0.5 becomes 0.
 sct_maths -i lesion_sum_minusone.nii.gz -thr 0.5 -o ${file_gtc}.nii.gz
 
 # Create soft ground truth by averaging all raters
