@@ -131,7 +131,7 @@ file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
 sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
 # binarize: everything that is below 1 becomes 0, the rest is one.
-sct_maths -i lesion_sum_minusone.nii.gz -thr 1 -o ${file_gtc}.nii.gz
+sct_maths -i lesion_sum_minusone.nii.gz -thr 0.5 -o ${file_gtc}.nii.gz
 
 # Create soft ground truth by averaging all raters
 sct_maths -i lesion_sum.nii.gz -div 2 -o ${file_soft}.nii.gz
