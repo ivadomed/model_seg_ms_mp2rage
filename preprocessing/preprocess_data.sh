@@ -112,12 +112,30 @@ sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.
 # Use dilated mask to crop the orginal image and manual MS segmentations
 sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
 
-# TODO: aggregate multiple raters
+# Go to subject folder for segmentation GTs
+cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
 
-# TODO: crop the manual segs
+# Define variables
+# TODO: Check if multiple rater filenames are correct or not
+file_gt1="${SUBJECT}_UNIT1_lesion-manual-rater1"
+file_gt2="${SUBJECT}_UNIT1_lesion-manual-rater2"
+file_gtc="${SUBJECT}_UNIT1_lesion-manual-majvote"
+# 'c' stands for the consensus GT
+
+# Redefine variable for final SC segmentation mask as path changed
+file_seg=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
+
+# Aggregate multiple raters with majority voting
+sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o ${file_gtc}.nii.gz
+sct_maths -i ${file_gtc}.nii.gz -sub 1 -o ${file_gtc}.nii.gz
+sct_maths -i ${file_gtc}.nii.gz -thr 1 -o ${file_gtc}.nii.gz
+
+# Crop the manual segs
+sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg}.nii.gz -o ${file_gt1}_crop.nii.gz
+sct_crop_image -i ${file_gt2}.nii.gz -m ${file_seg}.nii.gz -o ${file_gt2}_crop.nii.gz
+sct_crop_image -i ${file_gtc}.nii.gz -m ${file_seg}.nii.gz -o ${file_gtc}_crop.nii.gz
 
 # TODO: Create 'clean' output folder
-
 
 # Display useful info for the log
 end=`date +%s`
