@@ -123,7 +123,7 @@ file_gtc="${SUBJECT}_UNIT1_lesion-manual-majvote"
 # 'c' stands for the consensus GT
 
 # Redefine variable for final SC segmentation mask as path changed
-file_seg=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
+file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 
 # Aggregate multiple raters with majority voting
 sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o ${file_gtc}.nii.gz
@@ -131,9 +131,9 @@ sct_maths -i ${file_gtc}.nii.gz -sub 1 -o ${file_gtc}.nii.gz
 sct_maths -i ${file_gtc}.nii.gz -thr 1 -o ${file_gtc}.nii.gz
 
 # Crop the manual segs
-sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg}.nii.gz -o ${file_gt1}_crop.nii.gz
-sct_crop_image -i ${file_gt2}.nii.gz -m ${file_seg}.nii.gz -o ${file_gt2}_crop.nii.gz
-sct_crop_image -i ${file_gtc}.nii.gz -m ${file_seg}.nii.gz -o ${file_gtc}_crop.nii.gz
+sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_crop.nii.gz
+sct_crop_image -i ${file_gt2}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt2}_crop.nii.gz
+sct_crop_image -i ${file_gtc}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gtc}_crop.nii.gz
 
 # TODO: Create 'clean' output folder
 
