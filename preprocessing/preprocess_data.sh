@@ -120,20 +120,27 @@ cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
 file_gt1="${SUBJECT}_UNIT1_lesion-manual-rater1"
 file_gt2="${SUBJECT}_UNIT1_lesion-manual-rater2"
 file_gtc="${SUBJECT}_UNIT1_lesion-manual-majvote"
+file_soft="${SUBJECT}_UNIT1_lesion-manual-soft"
 # 'c' stands for the consensus GT
 
 # Redefine variable for final SC segmentation mask as path changed
 file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 
 # Aggregate multiple raters with majority voting
-sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o ${file_gtc}.nii.gz
-sct_maths -i ${file_gtc}.nii.gz -sub 1 -o ${file_gtc}.nii.gz
-sct_maths -i ${file_gtc}.nii.gz -thr 1 -o ${file_gtc}.nii.gz
+# TODO: if second rater missing, this will break. We need to accommodate.
+sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
+sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
+# binarize: everything that is below 1 becomes 0, the rest is one.
+sct_maths -i lesion_sum_minusone.nii.gz -thr 1 -o ${file_gtc}.nii.gz
+
+# Create soft ground truth by averaging all raters
+sct_maths -i lesion_sum.nii.gz -div 2 -o ${file_soft}.nii.gz
 
 # Crop the manual segs
 sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_crop.nii.gz
 sct_crop_image -i ${file_gt2}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt2}_crop.nii.gz
 sct_crop_image -i ${file_gtc}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gtc}_crop.nii.gz
+sct_crop_image -i ${file_soft}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_soft}_crop.nii.gz
 
 # TODO: Create 'clean' output folder
 
