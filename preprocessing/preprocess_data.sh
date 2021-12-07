@@ -150,6 +150,7 @@ cd $PATH_OUTPUT
 
 # Create and populate clean data processed folder for training
 PATH_DATA_PROCESSED_CLEAN="${PATH_DATA_PROCESSED}_clean"
+# Copy non-image files (eg: participants.tsv, etc.)
 if [[ ! -d $PATH_DATA_PROCESSED_CLEAN ]]; then
   rsync -avzh --exclude='*.nii.gz' $PATH_DATA_PROCESSED/. $PATH_DATA_PROCESSED_CLEAN
 fi
