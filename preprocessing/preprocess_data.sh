@@ -145,7 +145,35 @@ fi
 # Crop the manual seg
 sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_crop.nii.gz
 
-# TODO: Create 'clean' output folder
+# Go back to the root output path
+cd $PATH_OUTPUT
+
+# Create and populate clean data processed folder for training
+PATH_DATA_PROCESSED_CLEAN="${PATH_DATA_PROCESSED}_clean"
+if [[ ! -d $PATH_DATA_PROCESSED_CLEAN ]]; then
+  rsync -avzh --exclude='*.nii.gz' $PATH_DATA_PROCESSED/. $PATH_DATA_PROCESSED_CLEAN
+fi
+
+# Go to the clean subject folder for source images
+cd ${PATH_DATA_PROCESSED_CLEAN}/${SUBJECT}/anat
+
+# Copy source images for training
+rsync -avzh ${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file}.json .
+rsync -avzh ${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file}_crop.nii.gz .
+
+# Go to clean subject folder for segmentation GTs
+cd ${PATH_DATA_PROCESSED_CLEAN}/derivatives/labels/${SUBJECT}/anat
+
+# Copy segmentation GTs for training
+rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json .
+rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz .
+# Copy the second rater GT and aggregated GTs if second rater is present
+if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json .
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz .
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz .
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz .
+fi
 
 # Display useful info for the log
 end=`date +%s`
