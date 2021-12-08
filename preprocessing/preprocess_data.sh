@@ -158,22 +158,29 @@ fi
 # Go to the clean subject folder for source images
 cd ${PATH_DATA_PROCESSED_CLEAN}/${SUBJECT}/anat
 
-# Copy source images for training
-rsync -avzh ${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file}.json .
+# Rename JSON for source image for BIDS compliance
+mv ${file}.json ${file}_crop.json
+
+# Copy source image for training
 rsync -avzh ${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file}_crop.nii.gz .
 
 # Go to clean subject folder for segmentation GTs
 cd ${PATH_DATA_PROCESSED_CLEAN}/derivatives/labels/${SUBJECT}/anat
 
+# Rename JSON for first rater GT for BIDS compliance
+mv ${file_gt1}.json ${file_gt1}_crop.json
+
 # Copy segmentation GTs for training
-rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json .
-rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz .
-# Copy the second rater GT and aggregated GTs if second rater is present
+rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz .
+
 if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json .
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz .
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz .
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz .
+  # Rename JSON for second rater GT for BIDS compliance if second rater is present
+  mv ${file_gt2}.json ${file_gt2}_crop.json
+
+  # Copy the second rater GT and aggregated GTs if second rater is present
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz .
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz .
+  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz .
 fi
 
 # Display useful info for the log
