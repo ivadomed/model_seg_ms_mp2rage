@@ -53,7 +53,7 @@ segment_if_does_not_exist() {
   else
     echo "Not found. Proceeding with automatic segmentation."
     # Segment spinal cord
-    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
   fi
 }
 
@@ -149,28 +149,19 @@ cd $PATH_OUTPUT
 
 # Create and populate clean data processed folder for training
 PATH_DATA_PROCESSED_CLEAN="${PATH_DATA_PROCESSED}_clean"
-# Copy non-image files (eg: participants.tsv, etc.)
-if [[ ! -d $PATH_DATA_PROCESSED_CLEAN ]]; then
-  rsync -avzh --exclude='*.nii.gz' $PATH_DATA_PROCESSED/. $PATH_DATA_PROCESSED_CLEAN
-fi
-
-# Go to the clean subject folder for source images
-cd ${PATH_DATA_PROCESSED_CLEAN}/${SUBJECT}/anat
-
-# Copy source image for training
-rsync -avzh ${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file}_crop.nii.gz ${file}.nii.gz
-
-# Go to clean subject folder for segmentation GTs
-cd ${PATH_DATA_PROCESSED_CLEAN}/derivatives/labels/${SUBJECT}/anat
-
-# Copy segmentation GTs for training
-rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz ${file_gt1}.nii.gz
-
+mkdir -p $PATH_DATA_PROCESSED_CLEAN $PATH_DATA_PROCESSED_CLEAN/${SUBJECT} $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.json
+mkdir -p derivatives derivatives/labels derivatives/labels/${SUBJECT} derivatives/labels/${SUBJECT}/anat/
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json
+# If second rater is present, copy the other files
 if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
   # Copy the second rater GT and aggregated GTs if second rater is present
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz ${file_gt2}.nii.gz
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz ${file_gtc}.nii.gz
-  rsync -avzh ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz ${file_soft}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz
 fi
 
 # Display useful info for the log
