@@ -109,7 +109,7 @@ file_seg="${FILESEG}"
 # Dilate spinal cord mask
 sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.gz
 
-# Use dilated mask to crop the orginal image and manual MS segmentations
+# Use dilated mask to crop the original image and manual MS segmentations
 sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
 
 # Go to subject folder for segmentation GTs
