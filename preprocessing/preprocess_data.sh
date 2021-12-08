@@ -2,9 +2,8 @@
 #
 # Preprocess data.
 #
-# Dependencies:
-# - FSL <TODO: VERSION>
-# - SCT <TODO: VERSION>
+# Dependencies (versions):
+# - SCT (5.4.0)
 #
 # Usage:
 #   ./preprocess_data.sh <SUBJECT>
