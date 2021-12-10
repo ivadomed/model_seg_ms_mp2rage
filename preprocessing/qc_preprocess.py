@@ -32,7 +32,10 @@ subjects = subjects_df['participant_id'].values.tolist()
 # Log resolutions and sizes for data exploration
 resolutions, sizes = [], []
 
-# Perform QC for each subject
+# Log problematic subjects for QC
+failed_crop_subjects, shape_mismatch_subjects, left_out_lesion_subjects = [], [], []
+
+# Perform QC on each subject
 for subject in tqdm(subjects, desc='Iterating over Subjects'):
     # Get paths
     subject_images_path = os.path.join(args.sct_output_path, 'data_processed', subject, 'anat')
@@ -41,7 +44,7 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
     # Read cropped subject image (i.e. 3D volume) to be used for training
     img_crop_fpath = os.path.join(subject_images_path, '%s_UNIT1_crop.nii.gz' % subject)
     if not os.path.exists(img_crop_fpath):
-        print('Could not find cropped image for subject: %s' % subject)
+        failed_crop_subjects.append(subject)
         continue
     img_crop = nib.load(img_crop_fpath)
 
@@ -65,12 +68,17 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
 
     # Basic shape checks
     if not img_crop.shape == gt1_crop.shape == gt2_crop.shape:
-        raise ValueError('Shape mismatch in images and GTs for subject: %s' % subject)
+        shape_mismatch_subjects.append(subject)
+        continue
 
     # Check if the dilated SC mask leaves out any lesions from GTs (from each rater)
     if not (np.allclose(np.sum(gt1.get_fdata()), np.sum(gt1_crop.get_fdata())) and
             np.allclose(np.sum(gt2.get_fdata()), np.sum(gt2_crop.get_fdata()))):
-        print('\n\tALERT: Lesion(s) from raters cropped during preprocessing for subject: %s' % subject)
+        left_out_lesion_subjects.append(subject)
 
 print('RESOLUTIONS: ', Counter(resolutions))
 print('SIZES: ', Counter(sizes))
+
+print('Could not find cropped image for the following subjects: ', failed_crop_subjects)
+print('Found shape mismatch in images and GTs for the following subjects: ', shape_mismatch_subjects)
+print('ALERT: Lesion(s) from raters cropped during preprocessing for the following subjects: ', left_out_lesion_subjects)
