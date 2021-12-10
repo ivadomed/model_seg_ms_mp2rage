@@ -99,6 +99,11 @@ cd ${SUBJECT}/anat
 # Define variables
 file="${SUBJECT}_UNIT1"
 
+# Make sure the image metadata is a valid JSON object
+if [[ ! -s ${file}.json ]]; then
+  echo "{}" >> ${file}.json
+fi
+
 # Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
 # specify t1 contrast because the cord is bright and the CSF is dark (like on 
 # the traditional MPRAGE T1w data).
@@ -124,8 +129,17 @@ file_soft="${SUBJECT}_UNIT1_lesion-manual-soft"
 # Redefine variable for final SC segmentation mask as path changed
 file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 
+# Make sure the first rater metadata is a valid JSON object
+if [[ ! -s ${file_gt1}.json ]]; then
+  echo "{}" >> ${file_gt1}.json
+fi
+
 # Aggregate multiple raters if second rater is present
 if [[ -f ${file_gt2}.nii.gz ]]; then
+  # Make sure the second rater metadata is a valid JSON object
+  if [[ ! -s ${file_gt2}.json ]]; then
+    echo "{}" >> ${file_gt2}.json
+  fi
   # Create consensus ground truth by majority vote
   sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
   sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
