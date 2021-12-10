@@ -1,8 +1,8 @@
 {
     "command": "train",
     "gpu_ids": [0],
-    "path_output": "seg_ms_randomrater_output",
-    "model_name": "seg_ms_randomrater_model",
+    "path_output": "seg_ms_multiclassrater_output",
+    "model_name": "seg_ms_multiclassrater_model",
     "debugging": true,
     "object_detection_params": {
         "object_detection_path": null,
