@@ -23,5 +23,13 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
 The data need to be preprocessed before training. Here is the syntax: 
 
 ~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output ./data_basel-mp2rage -jobs -2
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -jobs <JOBS>
 ~~~
+
+After running the preprocessing, you can also run the quality-control (QC) script:
+```
+python preprocessing/qc_preprocess.py -s <PATH_OUTPUT>
+```
+which i) logs resolutions and sizes for each subject image for data exploration, 
+ii) performs basic shape checks for images and ground-truths (GTs), and most importantly 
+iii) checks if the dilated spinal-cord (SC) mask leaves out any lesions from the GT of each rater.
