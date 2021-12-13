@@ -41,6 +41,7 @@ segment_if_does_not_exist() {
   ###
   local file="$1"
   local contrast="$2"
+  local centerline_method="$3"
   # Update global variable with segmentation file name
   FILESEG="${file}_seg"
   FILESEGMANUAL="${PATH_DATA}/derivatives/labels/${SUBJECT}/anat/${FILESEG}-manual.nii.gz"
@@ -52,13 +53,21 @@ segment_if_does_not_exist() {
     sct_qc -i ${file}.nii.gz -s ${FILESEG}.nii.gz -p sct_deepseg_sc -qc ${PATH_QC} -qc-subject ${SUBJECT}
   else
     echo "Not found. Proceeding with automatic segmentation."
-    # Segment spinal cord
-    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    # Segment spinal cord based on the specified centerline method
+    if [[ $centerline_method == "cnn" ]]; then
+      sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    elif [[ $centerline_method == "svm" ]]; then
+      sct_deepseg_sc -i ${file}.nii.gz -c $contrast -centerline svm -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    else
+      echo "Centerline extraction method = ${centerline_method} is not recognized!"
+      exit 1
+    fi
   fi
 }
 
 # Retrieve input params and other params
 SUBJECT=$1
+CENTERLINE_METHOD=${2:-"cnn"}
 
 # get starting time:
 start=`date +%s`
@@ -107,7 +116,7 @@ fi
 # Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
 # specify t1 contrast because the cord is bright and the CSF is dark (like on 
 # the traditional MPRAGE T1w data).
-segment_if_does_not_exist ${file} t1
+segment_if_does_not_exist ${file} t1 ${CENTERLINE_METHOD}
 file_seg="${FILESEG}"
 
 # Dilate spinal cord mask
