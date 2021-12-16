@@ -6,8 +6,10 @@
 # - SCT (5.4.0)
 #
 # Usage:
-#   ./preprocess_data.sh <SUBJECT>
+#   ./preprocess_data.sh <SUBJECT> <CENTERLINE_METHOD>
 #
+# <SUBJECT> is the name of the subject in BIDS convention (sub-XXX)
+# <CENTERLINE_METHOD> is the method sct_deepseg_sc uses for centerline extraction (cnn or svm)
 #
 # Manual segmentations or labels should be located under:
 # PATH_DATA/derivatives/labels/SUBJECT/<CONTRAST>/
