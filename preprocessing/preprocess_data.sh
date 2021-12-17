@@ -209,7 +209,9 @@ elif [[ $TASK == "scseg" ]]; then
   if [[ -f $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json ]]; then
     rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
   else
+    # Get current datetime and set tabs to 4 spaces
     datetime=$(date +'%Y-%m-%d %H:%M:%S')
+    tabs 4
     echo -e "{\n\t\"Author\": \"Generated with sct_deepseg_sc\",\n\t\"Date\": \"${datetime}\"\n}" >> $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
   fi
 
