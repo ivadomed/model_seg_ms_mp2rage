@@ -30,16 +30,16 @@ where `<CENTERLINE_METHOD>` is either `cnn` (default value) or `svm` and
 `<TASK>` is either `lesionseg` (default value) or `scseg`. You can leave the `-script-args` 
 argument empty to stick to the default values.
 
-To run preprocessing for the lesion segmentation task:
-
-~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-lesionseg -script-args "svm lesionseg" -jobs <JOBS>
-~~~
-
 To run preprocessing for the spinal cord (SC) segmentation task:
 
 ~~~
 sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-scseg -script-args "svm scseg" -jobs <JOBS>
+~~~
+
+To run preprocessing for the lesion segmentation task:
+
+~~~
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-lesionseg -script-args "svm lesionseg" -jobs <JOBS>
 ~~~
 
 After running the preprocessing, you can also run the quality-control (QC) script:
