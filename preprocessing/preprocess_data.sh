@@ -213,7 +213,6 @@ elif [[ $TASK == "scseg" ]]; then
     datetime=$(date +'%Y-%m-%d %H:%M:%S')
     echo -e "{\n    \"Author\": \"Generated with sct_deepseg_sc\",\n    \"Date\": \"${datetime}\"\n}" >> $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
   fi
-
 else
   echo "Task = ${TASK} is not recognized!"
   exit 1
