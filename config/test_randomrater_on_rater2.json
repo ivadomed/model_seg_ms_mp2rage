@@ -1,0 +1,74 @@
+{
+    "command": "test",
+    "gpu_ids": [0],
+    "path_output": "seg_ms_randomrater_output",
+    "model_name": "seg_ms_randomrater_model",
+    "debugging": true,
+    "object_detection_params": {
+        "object_detection_path": null,
+        "safety_factor": [1.0, 1.0, 1.0]
+    },
+    "loader_parameters": {
+        "path_data": ["basel-mp2rage-preprocessed/data_processed_clean"],
+        "subject_selection": {
+            "n": [],
+            "metadata": [],
+            "value": []
+        },
+        "target_suffix": ["_lesion-manual2"],
+        "extensions": [],
+        "roi_params": {
+            "suffix": null,
+            "slice_filter_roi": null
+        },
+        "contrast_params": {
+            "training_validation": ["UNIT1"],
+            "testing": ["UNIT1"],
+            "balance": {}
+        },
+        "slice_filter_params": {
+            "filter_empty_mask": true,
+            "filter_empty_input": true
+        },
+        "slice_axis": "axial",
+        "multichannel": false,
+        "soft_gt": false
+    },
+    "split_dataset": {
+        "fname_split": null,
+        "random_seed": 42,
+        "center_test": [],
+        "method": "per_patient",
+        "balance": null,
+        "train_fraction": 0.75,
+        "test_fraction": 0.2
+    },
+    "uncertainty": {
+        "epistemic": false,
+        "aleatoric": false,
+        "n_it": 0
+    },
+    "postprocessing": {"binarize_prediction": {"thr": 0.5}},
+    "evaluation_parameters": {},
+    "transformation": {
+        "Resample": {
+            "wspace": 1.0,
+            "hspace": 1.0,
+            "dspace": 1.0
+        },
+        "CenterCrop": {
+            "size": [64, 128, 32]
+        },
+        "NumpyToTensor": {},
+        "NormalizeInstance": {
+            "applied_to": ["im"]
+        }
+    },
+    "Modified3DUNet": {
+        "applied": true,
+        "length_3D": [64, 128, 32],
+        "stride_3D": [64, 128, 32],
+        "attention": false,
+        "n_filters": 8
+    }
+}
