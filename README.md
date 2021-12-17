@@ -23,8 +23,11 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
 The data need to be preprocessed before training. Here is the syntax: 
 
 ~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -jobs <JOBS>
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -script-args "<CENTERLINE_METHOD>" -jobs <JOBS>
 ~~~
+
+where `<CENTERLINE_METHOD>` is either `svm` or `cnn`. You can also leave out the `-script-args` argument in which case `cnn` will be used by default in the preprocessing script.
+[#10](https://github.com/ivadomed/model_seg_ms_mp2rage/issues/10) is a related issue you can check.
 
 After running the preprocessing, you can also run the quality-control (QC) script:
 ```
