@@ -20,14 +20,27 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
  
 ## Prepare the data
 
-The data need to be preprocessed before training. Here is the syntax: 
+The data need to be preprocessed before training. The general syntax for preprocessing is:
 
 ~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -script-args "<CENTERLINE_METHOD>" -jobs <JOBS>
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -script-args "-centerline_method <CENTERLINE_METHOD> -task <TASK>" -jobs <JOBS>
 ~~~
 
-where `<CENTERLINE_METHOD>` is either `svm` or `cnn`. You can also leave out the `-script-args` argument in which case `cnn` will be used by default in the preprocessing script.
-[#10](https://github.com/ivadomed/model_seg_ms_mp2rage/issues/10) is a related issue you can check.
+where `<CENTERLINE_METHOD>` is either `cnn` (default value) or `svm` and 
+`<TASK>` is either `lesionseg` (default value) or `scseg`. You can leave the `-script-args` 
+argument empty to stick to the default values.
+
+To run preprocessing for the lesion segmentation task:
+
+~~~
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-lesionseg -script-args "svm lesionseg" -jobs <JOBS>
+~~~
+
+To run preprocessing for the spinal cord (SC) segmentation task:
+
+~~~
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-scseg -script-args "svm scseg" -jobs <JOBS>
+~~~
 
 After running the preprocessing, you can also run the quality-control (QC) script:
 ```
