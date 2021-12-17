@@ -27,8 +27,8 @@
             "balance": {}
         },
         "slice_filter_params": {
-            "filter_empty_mask": true,
-            "filter_empty_input": true
+            "filter_empty_mask": false,
+            "filter_empty_input": false
         },
         "slice_axis": "axial",
         "multichannel": false,
@@ -36,11 +36,11 @@
     },
     "split_dataset": {
         "fname_split": null,
-        "random_seed": 5,
+        "random_seed": 42,
         "center_test": [],
         "method": "per_patient",
         "balance": null,
-        "train_fraction": 0.7,
+        "train_fraction": 0.75,
         "test_fraction": 0.2
     },
     "training_parameters": {
@@ -50,14 +50,14 @@
         },
         "training_time": {
             "num_epochs": 500,
-            "early_stopping_patience": 150,
+            "early_stopping_patience": 200,
             "early_stopping_epsilon": 0.001
         },
         "scheduler": {
             "initial_lr": 1e-3,
             "lr_scheduler": {
                 "name": "CosineAnnealingLR",
-                "base_lr": 1e-4,
+                "base_lr": 1e-5,
                 "max_lr": 1e-3
             }
         },
@@ -75,9 +75,9 @@
     "default_model": {
         "name": "Unet",
         "dropout_rate": 0.3,
-        "bn_momentum": 0.9,
-        "depth": 3,
-        "is_2d": true,
+        "bn_momentum": 0.1,
+        "depth": 4,
+        "is_2d": false,
         "final_activation": "sigmoid"
     },
     "uncertainty": {
@@ -96,9 +96,13 @@
         "CenterCrop": {
             "size": [64, 128, 32]
         },
+        "RandomReverse": {
+            "applied_to": ["im", "gt"],
+            "dataset_type": ["training"]
+        },
         "RandomAffine": {
             "degrees": 10,
-            "scale": [0.1, 0.1, 0.1],
+            "scale": [0.2, 0.2, 0.2],
             "translate": [0.0, 0.0, 0.0],
             "applied_to": ["im", "gt"],
             "dataset_type": ["training"]
@@ -106,8 +110,14 @@
         "ElasticTransform": {
             "alpha_range": [25.0, 35.0],
             "sigma_range": [3.5, 5.5],
-            "p": 0.3,
+            "p": 0.5,
             "applied_to": ["im", "gt"],
+            "dataset_type": ["training"]
+        },
+        "RandomGamma": {
+            "log_gamma_range": [-3.0, 3.0],
+            "p": 0.5,
+            "applied_to": ["im"],
             "dataset_type": ["training"]
         },
         "NumpyToTensor": {},
@@ -120,6 +130,6 @@
         "length_3D": [64, 128, 32],
         "stride_3D": [64, 128, 32],
         "attention": false,
-        "n_filters": 4
+        "n_filters": 8
     }
 }
