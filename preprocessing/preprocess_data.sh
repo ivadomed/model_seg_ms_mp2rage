@@ -70,8 +70,6 @@ segment_if_does_not_exist() {
 
 # Retrieve input params and other params
 SUBJECT=$1
-CENTERLINE_METHOD=${2:-"cnn"}
-TASK=${3:-"lesionseg"}
 
 # get starting time:
 start=`date +%s`
@@ -120,7 +118,7 @@ fi
 # Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
 # specify t1 contrast because the cord is bright and the CSF is dark (like on 
 # the traditional MPRAGE T1w data).
-segment_if_does_not_exist ${file} t1 ${CENTERLINE_METHOD}
+segment_if_does_not_exist ${file} t1 svm
 file_seg="${FILESEG}"
 
 # Dilate spinal cord mask
@@ -174,48 +172,48 @@ sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_cr
 # Go back to the root output path
 cd $PATH_OUTPUT
 
-# Create and populate clean data processed folder for training
-PATH_DATA_PROCESSED_CLEAN="${PATH_DATA_PROCESSED}_clean"
+# Create clean data processed folders for two tasks: spinal cord (SC) segmentation and lesion segmentation
+PATH_DATA_PROCESSED_SCSEG="${PATH_DATA_PROCESSED}_scseg"
+PATH_DATA_PROCESSED_LESIONSEG="${PATH_DATA_PROCESSED}_lesionseg"
 
-# Copy over required BIDs files
-mkdir -p $PATH_DATA_PROCESSED_CLEAN $PATH_DATA_PROCESSED_CLEAN/${SUBJECT} $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat
-rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_CLEAN/
-rsync -avzh $PATH_DATA_PROCESSED/participants.* $PATH_DATA_PROCESSED_CLEAN/
-rsync -avzh $PATH_DATA_PROCESSED/README $PATH_DATA_PROCESSED_CLEAN/
+# Copy over required BIDs files to both folders
+mkdir -p $PATH_DATA_PROCESSED_SCSEG $PATH_DATA_PROCESSED_SCSEG/${SUBJECT} $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat
+mkdir -p $PATH_DATA_PROCESSED_LESIONSEG $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat
+rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_LESIONSEG/
+rsync -avzh $PATH_DATA_PROCESSED/participants.* $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/participants.* $PATH_DATA_PROCESSED_LESIONSEG/
+rsync -avzh $PATH_DATA_PROCESSED/README $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/README $PATH_DATA_PROCESSED_LESIONSEG/
 
-if [[ $TASK == "lesionseg" ]]; then
-  # For lesion segmentation task, copy SC crops as inputs and lesion annotations as targets
-  rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.nii.gz
-  rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.json
-  mkdir -p $PATH_DATA_PROCESSED_CLEAN/derivatives $PATH_DATA_PROCESSED_CLEAN/derivatives/labels $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/
-  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz
-  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json
-  # If second rater is present, copy the other files
-  if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
-    # Copy the second rater GT and aggregated GTs if second rater is present
-    rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz
-    rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json
-    rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz
-    rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz
-  fi
-elif [[ $TASK == "scseg" ]]; then
-  # For SC segmentation task, copy raw subject images as inputs and SC masks as targets
-  rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.nii.gz $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.nii.gz
-  rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_CLEAN/${SUBJECT}/anat/${file}.json
-  mkdir -p $PATH_DATA_PROCESSED_CLEAN/derivatives $PATH_DATA_PROCESSED_CLEAN/derivatives/labels $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/
-  file_seg_gt="${file}_seg-manual"
-  rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_seg.nii.gz $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.nii.gz
-  # Copy the relevant JSON: use auto-generated JSON for manually corrected and create new JSON for sct_deepseg_sc generated SC segs
-  if [[ -f $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json ]]; then
-    rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
-  else
-    # Get current datetime and set tabs to 4 spaces
-    datetime=$(date +'%Y-%m-%d %H:%M:%S')
-    echo -e "{\n    \"Author\": \"Generated with sct_deepseg_sc\",\n    \"Date\": \"${datetime}\"\n}" >> $PATH_DATA_PROCESSED_CLEAN/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
-  fi
+# For SC segmentation task, copy raw subject images as inputs and SC masks as targets
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.nii.gz $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat/${file}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat/${file}.json
+mkdir -p $PATH_DATA_PROCESSED_SCSEG/derivatives $PATH_DATA_PROCESSED_SCSEG/derivatives/labels $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/
+file_seg_gt="${file}_seg-manual"
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_seg.nii.gz $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.nii.gz
+# Copy the relevant JSON: use auto-generated JSON for manually corrected and create new JSON for sct_deepseg_sc generated SC segs
+if [[ -f $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json ]]; then
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
 else
-  echo "Task = ${TASK} is not recognized!"
-  exit 1
+  # Get current datetime and set tabs to 4 spaces
+  datetime=$(date +'%Y-%m-%d %H:%M:%S')
+  echo -e "{\n    \"Author\": \"Generated with sct_deepseg_sc\",\n    \"Date\": \"${datetime}\"\n}" >> $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
+fi
+
+# For lesion segmentation task, copy SC crops as inputs and lesion annotations as targets
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat/${file}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat/${file}.json
+mkdir -p $PATH_DATA_PROCESSED_LESIONSEG/derivatives $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json
+# If second rater is present, copy the other files
+if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
+  # Copy the second rater GT and aggregated GTs if second rater is present
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz
 fi
 
 
