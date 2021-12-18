@@ -20,32 +20,20 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
  
 ## Prepare the data
 
-The data need to be preprocessed before training. The general syntax for preprocessing is:
+The data need to be preprocessed before training. The preprocessing command is:
 
 ~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -script-args "-centerline_method <CENTERLINE_METHOD> -task <TASK>" -jobs <JOBS>
+sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -jobs <JOBS>
 ~~~
 
-where `<CENTERLINE_METHOD>` is either `cnn` (default value) or `svm` and 
-`<TASK>` is either `lesionseg` (default value) or `scseg`. You can leave the `-script-args` 
-argument empty to stick to the default values.
-
-To run preprocessing for the spinal cord (SC) segmentation task:
-
-~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-scseg -script-args "svm scseg" -jobs <JOBS>
-~~~
-
-To run preprocessing for the lesion segmentation task:
-
-~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output basel-mp2rage-preprocessed-lesionseg -script-args "svm lesionseg" -jobs <JOBS>
-~~~
+This command will create a `data_processed_scseg` folder for the SC segmentation task and a 
+`data_processed_lesionseg` folder for the lesion segmentation task inside the `<PATH_OUTPUT>` 
+you specified. Each of these two folders contain only the required files for their respective task.
 
 After running the preprocessing, you can also run the quality-control (QC) script:
 ```
 python preprocessing/qc_preprocess.py -s <PATH_OUTPUT>
 ```
-which i) logs resolutions and sizes for each subject image for data exploration, 
-ii) performs basic shape checks for images and ground-truths (GTs), and most importantly 
+which i) logs resolutions and sizes for each SC-cropped subject image for data exploration, 
+ii) performs basic shape checks for SC-cropped images and ground-truths (GTs), and most importantly 
 iii) checks if the dilated spinal-cord (SC) mask leaves out any lesions from the GT of each rater.
