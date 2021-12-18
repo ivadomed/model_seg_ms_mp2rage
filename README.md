@@ -23,7 +23,7 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
 The data need to be preprocessed before training. The preprocessing command is:
 
 ~~~
-sct_run_batch -script <PATH_TO_REPOSITORY>/model_seg_ms_mp2rage/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -jobs <JOBS>
+sct_run_batch -script <PATH_TO_REPOSITORY>/preprocessing/preprocess_data.sh -path-data <PATH_TO_DATA>/basel-mp2rage/ -path-output <PATH_OUTPUT> -jobs <JOBS>
 ~~~
 
 This command will create a `data_processed_scseg` folder for the SC segmentation task and a 
