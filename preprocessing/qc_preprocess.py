@@ -30,7 +30,7 @@ subjects_df = pd.read_csv(os.path.join(args.sct_output_path, 'data_processed', '
 subjects = subjects_df['participant_id'].values.tolist()
 
 # Log resolutions and sizes for data exploration
-resolutions, sizes = [], []
+resolutions, sizes, crop_sizes = [], [], []
 
 # Log problematic subjects for QC
 failed_crop_subjects, shape_mismatch_subjects, left_out_lesion_subjects = [], [], []
@@ -41,18 +41,22 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
     subject_images_path = os.path.join(args.sct_output_path, 'data_processed', subject, 'anat')
     subject_labels_path = os.path.join(args.sct_output_path, 'data_processed', 'derivatives', 'labels', subject, 'anat')
 
-    # Read cropped subject image (i.e. 3D volume) to be used for training
+    # Read original and cropped subject image (i.e. 3D volume) to be used for training
+    img_path = os.path.join(subject_images_path, '%s_UNIT1.nii.gz' % subject)
     img_crop_fpath = os.path.join(subject_images_path, '%s_UNIT1_crop.nii.gz' % subject)
     if not os.path.exists(img_crop_fpath):
         failed_crop_subjects.append(subject)
         continue
+    img = nib.load(img_path)
     img_crop = nib.load(img_crop_fpath)
 
     # Get and log size and resolution for each subject image
-    size = img_crop.get_fdata().shape
+    size = img.get_fdata().shape
+    crop_size = img_crop.get_fdata().shape
     resolution = tuple(img_crop.header['pixdim'].tolist()[1:4])
     resolution = tuple([np.round(r, 1) for r in list(resolution)])
     sizes.append(size)
+    crop_sizes.append(crop_size)
     resolutions.append(resolution)
 
     # Read original and cropped subject ground-truths (GT)
@@ -78,6 +82,7 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
 
 print('RESOLUTIONS: ', Counter(resolutions))
 print('SIZES: ', Counter(sizes))
+print('CROP SIZES: ', Counter(crop_sizes))
 
 print('Could not find cropped image for the following subjects: ', failed_crop_subjects)
 print('Found shape mismatch in images and GTs for the following subjects: ', shape_mismatch_subjects)
