@@ -9,7 +9,7 @@
         "safety_factor": [1.0, 1.0, 1.0]
     },
     "loader_parameters": {
-        "path_data": ["basel-mp2rage-preprocessed-scseg/data_processed_clean"],
+        "path_data": ["basel-mp2rage-preprocessed/data_processed_scseg"],
         "subject_selection": {
             "n": [],
             "metadata": [],
@@ -94,7 +94,7 @@
             "dspace": 1.0
         },
         "CenterCrop": {
-            "size": [128, 128, 128]
+            "size": [256, 256, 256]
         },
         "RandomReverse": {
             "applied_to": ["im", "gt"],
