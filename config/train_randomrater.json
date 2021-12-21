@@ -1,15 +1,15 @@
 {
     "command": "train",
     "gpu_ids": [0],
-    "path_output": "seg_ms_randomrater_output",
-    "model_name": "seg_ms_randomrater_model",
+    "path_output": "seg_ms_output",
+    "model_name": "seg_ms_model",
     "debugging": true,
     "object_detection_params": {
         "object_detection_path": null,
         "safety_factor": [1.0, 1.0, 1.0]
     },
     "loader_parameters": {
-        "path_data": ["basel-mp2rage-preprocessed/data_processed_clean"],
+        "path_data": ["basel-mp2rage-preprocessed/data_processed_lesionseg"],
         "subject_selection": {
             "n": [],
             "metadata": [],
@@ -94,7 +94,7 @@
             "dspace": 1.0
         },
         "CenterCrop": {
-            "size": [64, 128, 32]
+            "size": [32, 64, 128]
         },
         "RandomReverse": {
             "applied_to": ["im", "gt"],
@@ -102,8 +102,8 @@
         },
         "RandomAffine": {
             "degrees": 10,
-            "scale": [0.2, 0.2, 0.2],
-            "translate": [0.0, 0.0, 0.0],
+            "scale": [0.3, 0.3, 0.3],
+            "translate": [0.1, 0.1, 0.1],
             "applied_to": ["im", "gt"],
             "dataset_type": ["training"]
         },
@@ -115,8 +115,21 @@
             "dataset_type": ["training"]
         },
         "RandomGamma": {
-            "log_gamma_range": [-3.0, 3.0],
+            "log_gamma_range": [-1.5, 1.5],
             "p": 0.5,
+            "applied_to": ["im"],
+            "dataset_type": ["training"]
+        },
+        "RandomBiasField": {
+            "coefficients": 0.5,
+            "order": 3,
+            "p": 0.3,
+            "applied_to": ["im"],
+            "dataset_type": ["training"]
+        },
+        "RandomBlur": {
+            "sigma_range": [0.0, 1.0],
+            "p": 0.3,
             "applied_to": ["im"],
             "dataset_type": ["training"]
         },
@@ -127,8 +140,8 @@
     },
     "Modified3DUNet": {
         "applied": true,
-        "length_3D": [64, 128, 32],
-        "stride_3D": [64, 128, 32],
+        "length_3D": [32, 64, 128],
+        "stride_3D": [32, 64, 128],
         "attention": false,
         "n_filters": 8
     }
