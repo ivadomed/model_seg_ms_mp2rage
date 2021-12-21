@@ -1,8 +1,8 @@
 {
     "command": "test",
     "gpu_ids": [0],
-    "path_output": "seg_ms_output",
-    "model_name": "seg_ms_model",
+    "path_output": "seg_lesion_output",
+    "model_name": "seg_lesion_model",
     "debugging": true,
     "object_detection_params": {
         "object_detection_path": null,
@@ -15,7 +15,7 @@
             "metadata": [],
             "value": []
         },
-        "target_suffix": ["_lesion-manual2"],
+        "target_suffix": ["_lesion-manual"],
         "extensions": [],
         "roi_params": {
             "suffix": null,
