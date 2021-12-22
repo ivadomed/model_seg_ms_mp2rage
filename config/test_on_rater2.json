@@ -30,7 +30,7 @@
             "filter_empty_mask": true,
             "filter_empty_input": true
         },
-        "slice_axis": "axial",
+        "slice_axis": "sagittal",
         "multichannel": false,
         "soft_gt": false
     },
@@ -57,7 +57,7 @@
             "dspace": 1.0
         },
         "CenterCrop": {
-            "size": [32, 64, 128]
+            "size": [128, 64, 32]
         },
         "NumpyToTensor": {},
         "NormalizeInstance": {
@@ -66,8 +66,8 @@
     },
     "Modified3DUNet": {
         "applied": true,
-        "length_3D": [32, 64, 128],
-        "stride_3D": [32, 64, 128],
+        "length_3D": [128, 64, 32],
+        "stride_3D": [128, 64, 32],
         "attention": false,
         "n_filters": 8
     }
