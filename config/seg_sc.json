@@ -30,7 +30,7 @@
             "filter_empty_mask": false,
             "filter_empty_input": false
         },
-        "slice_axis": "axial",
+        "slice_axis": "sagittal",
         "multichannel": false,
         "soft_gt": false
     },
@@ -49,8 +49,8 @@
             "name": "DiceLoss"
         },
         "training_time": {
-            "num_epochs": 500,
-            "early_stopping_patience": 200,
+            "num_epochs": 200,
+            "early_stopping_patience": 50,
             "early_stopping_epsilon": 0.001
         },
         "scheduler": {
