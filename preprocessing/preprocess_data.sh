@@ -2,13 +2,15 @@
 #
 # Preprocess data.
 #
-# Dependencies:
-# - FSL <TODO: VERSION>
-# - SCT <TODO: VERSION>
+# Dependencies (versions):
+# - SCT (5.4.0)
 #
 # Usage:
-#   ./preprocess_data.sh <SUBJECT>
+#   ./preprocess_data.sh <SUBJECT> <CENTERLINE_METHOD> <TASK>
 #
+# <SUBJECT> is the name of the subject in BIDS convention (sub-XXX)
+# <CENTERLINE_METHOD> is the method sct_deepseg_sc uses for centerline extraction (cnn or svm)
+# <TASK> is the aimed training task which will guide preprocessing (scseg or lesionseg)
 #
 # Manual segmentations or labels should be located under:
 # PATH_DATA/derivatives/labels/SUBJECT/<CONTRAST>/
@@ -42,6 +44,7 @@ segment_if_does_not_exist() {
   ###
   local file="$1"
   local contrast="$2"
+  local centerline_method="$3"
   # Update global variable with segmentation file name
   FILESEG="${file}_seg"
   FILESEGMANUAL="${PATH_DATA}/derivatives/labels/${SUBJECT}/anat/${FILESEG}-manual.nii.gz"
@@ -53,8 +56,15 @@ segment_if_does_not_exist() {
     sct_qc -i ${file}.nii.gz -s ${FILESEG}.nii.gz -p sct_deepseg_sc -qc ${PATH_QC} -qc-subject ${SUBJECT}
   else
     echo "Not found. Proceeding with automatic segmentation."
-    # Segment spinal cord
-    sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    # Segment spinal cord based on the specified centerline method
+    if [[ $centerline_method == "cnn" ]]; then
+      sct_deepseg_sc -i ${file}.nii.gz -c $contrast -brain 1 -centerline cnn -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    elif [[ $centerline_method == "svm" ]]; then
+      sct_deepseg_sc -i ${file}.nii.gz -c $contrast -centerline svm -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    else
+      echo "Centerline extraction method = ${centerline_method} is not recognized!"
+      exit 1
+    fi
   fi
 }
 
@@ -100,16 +110,21 @@ cd ${SUBJECT}/anat
 # Define variables
 file="${SUBJECT}_UNIT1"
 
+# Make sure the image metadata is a valid JSON object
+if [[ ! -s ${file}.json ]]; then
+  echo "{}" >> ${file}.json
+fi
+
 # Spinal cord segmentation. Here, we are dealing with MP2RAGE contrast. We 
 # specify t1 contrast because the cord is bright and the CSF is dark (like on 
 # the traditional MPRAGE T1w data).
-segment_if_does_not_exist ${file} t1
+segment_if_does_not_exist ${file} t1 svm
 file_seg="${FILESEG}"
 
 # Dilate spinal cord mask
 sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.gz
 
-# Use dilated mask to crop the orginal image and manual MS segmentations
+# Use dilated mask to crop the original image and manual MS segmentations
 sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
 
 # Go to subject folder for segmentation GTs
@@ -125,8 +140,17 @@ file_soft="${SUBJECT}_UNIT1_lesion-manual-soft"
 # Redefine variable for final SC segmentation mask as path changed
 file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
 
+# Make sure the first rater metadata is a valid JSON object
+if [[ ! -s ${file_gt1}.json ]]; then
+  echo "{}" >> ${file_gt1}.json
+fi
+
 # Aggregate multiple raters if second rater is present
 if [[ -f ${file_gt2}.nii.gz ]]; then
+  # Make sure the second rater metadata is a valid JSON object
+  if [[ ! -s ${file_gt2}.json ]]; then
+    echo "{}" >> ${file_gt2}.json
+  fi
   # Create consensus ground truth by majority vote
   sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
   sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
@@ -145,7 +169,54 @@ fi
 # Crop the manual seg
 sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_crop.nii.gz
 
-# TODO: Create 'clean' output folder
+# Go back to the root output path
+cd $PATH_OUTPUT
+
+# Create clean data processed folders for two tasks: spinal cord (SC) segmentation and lesion segmentation
+PATH_DATA_PROCESSED_SCSEG="${PATH_DATA_PROCESSED}_scseg"
+PATH_DATA_PROCESSED_LESIONSEG="${PATH_DATA_PROCESSED}_lesionseg"
+
+# Copy over required BIDs files to both folders
+mkdir -p $PATH_DATA_PROCESSED_SCSEG $PATH_DATA_PROCESSED_SCSEG/${SUBJECT} $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat
+mkdir -p $PATH_DATA_PROCESSED_LESIONSEG $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat
+rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_LESIONSEG/
+rsync -avzh $PATH_DATA_PROCESSED/participants.* $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/participants.* $PATH_DATA_PROCESSED_LESIONSEG/
+rsync -avzh $PATH_DATA_PROCESSED/README $PATH_DATA_PROCESSED_SCSEG/
+rsync -avzh $PATH_DATA_PROCESSED/README $PATH_DATA_PROCESSED_LESIONSEG/
+
+# For SC segmentation task, copy raw subject images as inputs and SC masks as targets
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.nii.gz $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat/${file}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat/${file}.json
+mkdir -p $PATH_DATA_PROCESSED_SCSEG/derivatives $PATH_DATA_PROCESSED_SCSEG/derivatives/labels $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/
+file_seg_gt="${file}_seg-manual"
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_seg.nii.gz $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.nii.gz
+# Copy the relevant JSON: use auto-generated JSON for manually corrected and create new JSON for sct_deepseg_sc generated SC segs
+if [[ -f $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json ]]; then
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
+else
+  # Get current datetime and set tabs to 4 spaces
+  datetime=$(date +'%Y-%m-%d %H:%M:%S')
+  echo -e "{\n    \"Author\": \"Generated with sct_deepseg_sc\",\n    \"Date\": \"${datetime}\"\n}" >> $PATH_DATA_PROCESSED_SCSEG/derivatives/labels/${SUBJECT}/anat/${file_seg_gt}.json
+fi
+
+# For lesion segmentation task, copy SC crops as inputs and lesion annotations as targets
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat/${file}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat/${file}.json
+mkdir -p $PATH_DATA_PROCESSED_LESIONSEG/derivatives $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz
+rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json
+# If second rater is present, copy the other files
+if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
+  # Copy the second rater GT and aggregated GTs if second rater is present
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz
+  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz
+fi
+
+
 
 # Display useful info for the log
 end=`date +%s`
