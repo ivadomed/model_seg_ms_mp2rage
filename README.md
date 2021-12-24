@@ -52,7 +52,7 @@ ivadomed --train -c config/seg_lesion.json
 
 ## Get trained models
 
-```console
+```
 cp -r ~/duke/temp/uzay/saved_models_basel/seg_sc_output .
 cp -r ~/duke/temp/uzay/saved_models_basel/seg_lesion_output .
 ```
