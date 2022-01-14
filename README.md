@@ -17,6 +17,15 @@ git clone https://github.com/ivadomed/model_seg_ms_mp2rage.git
 
 - git@data.neuro.polymtl.ca:datasets/basel-mp2rage
 - Commit: 93110d8ebb65398dcc6e4528bf548eb7828332f1
+
+### Example calls to get the data
+
+~~~
+git clone git@data.neuro.polymtl.ca:datasets/basel-mp2rage
+cd basel-mp2rage
+git annex get .
+cd ..
+~~~
  
 ## Prepare the data
 
@@ -27,12 +36,12 @@ sct_run_batch -script <PATH_TO_REPOSITORY>/preprocessing/preprocess_data.sh -pat
 ~~~
 
 This command will create a `data_processed_scseg` folder for the SC segmentation task and a 
-`data_processed_lesionseg` folder for the lesion segmentation task inside the `<PATH_OUTPUT>` 
+`data_processed_lesionseg` folder for the lesion segmentation task inside the `basel-mp2rage-preprocessed` 
 you specified. Each of these two folders contain only the required files for their respective task.
 
 After running the preprocessing, you can also run the quality-control (QC) script:
 ```
-python preprocessing/qc_preprocess.py -s <PATH_OUTPUT>
+python preprocessing/qc_preprocess.py -s basel-mp2rage-preprocessed
 ```
 which i) logs resolutions and sizes for each subject image (both raw and cropped) for data exploration, 
 ii) performs basic shape checks for spinal cord (SC) cropped images and ground-truths (GTs), and 
