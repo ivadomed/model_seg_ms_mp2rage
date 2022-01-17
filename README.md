@@ -1,6 +1,11 @@
 # model_seg_ms_mp2rage
 
-Model repository for MS lesion segmentation on MP2RAGE data as discussed in https://github.com/ivadomed/ivadomed/issues/821.
+Model repository for MS lesion segmentation on MP2RAGE data as discussed [here](https://github.com/ivadomed/ivadomed/issues/821).
+This repository contains two models, one for spinal cord (SC) segmentation and one for MS lesion segmentation.
+
+## Model overview 
+
+![model_overview](https://github.com/ivadomed/model_seg_ms_mp2rage/releases/download/r20211223/model_overview.png)
 
 ## Dependencies
 
