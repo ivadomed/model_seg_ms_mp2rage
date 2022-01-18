@@ -10,7 +10,7 @@ This repository contains two models, one for spinal cord (SC) segmentation and o
 ## Dependencies
 
 - [SCT](https://spinalcordtoolbox.com/) commit: 7fd2ea718751dd858840c3823c0830a910d9777c
-- [ivadomed](https://ivadomed.org) commit: git-master-93ba03df76d229d8a190c694f757da6c00efa545
+- [ivadomed](https://ivadomed.org) commit: 704041a1adc185fb423785f2acd369ba6b6eb6b0
 
 ## Clone this repository
 
