@@ -15,7 +15,7 @@
             "metadata": [],
             "value": []
         },
-        "target_suffix": ["_lesion-manual"],
+        "target_suffix": ["_lesion-manual.nii.gz"],
         "extensions": [],
         "roi_params": {
             "suffix": null,
