@@ -32,14 +32,14 @@ def main(path_input, path_output):
     os.makedirs(path_output, exist_ok=True)
     
     images = {
-    "MP2RAGE_UNI_Images.nii.gz": "_MP2R_INsIDER_SCT_Seg_COR.nii.gz"
+    "MP2RAGE_UNI_Images.nii.gz": "_UNIT1.nii.gz"
     }
 
     der1 = {
-        "MP2RAGE_UNI_Images_seg.nii.gz": "_MP2R_INsIDER_SCT_Seg_COR_seg-manual.nii.gz"
+        "MP2RAGE_UNI_Images_seg.nii.gz": "_UNIT1_seg-manual.nii.gz"
     }
     der2 = {
-        "MP2RAGE_UNI_Images_lesion_Cor_CT.nii.gz": "_MP2R_INsIDER_SCT_Seg_COR_lesion-manual.nii.gz"
+        "MP2RAGE_UNI_Images_lesion_Cor_CT.nii.gz": "_UNIT1_lesion-manual.nii.gz"
     }
 
     for dirs, subdirs, files in os.walk(path_input):
@@ -74,19 +74,19 @@ def main(path_input, path_output):
         for file in fileList:
             if file.endswith('.nii.gz'):
                 originalFilePath = os.path.join(dirName, file)
-                jsonSidecarPath = os.path.join(dirName, os.path.splitext(file)[0] + '.json')
+                jsonSidecarPath = os.path.join(dirName, file.split(sep='.')[0] + '.json')
                 if not os.path.exists(jsonSidecarPath):
                     print("Missing: " + jsonSidecarPath)
                     if file.endswith('lesion-manual.nii.gz'):
                         data_json_label = {}
-                        data_json_label[u'Author'] = ""
+                        data_json_label[u'Author'] = "Katrin"
                         data_json_label[u'Label'] = "lesion-manual"
                         with open(jsonSidecarPath, 'w') as outfile:
                             outfile.write(json.dumps(data_json_label, indent=2, sort_keys=True))
                         outfile.close()
                     elif file.endswith("seg-manual.nii.gz"):
                         data_json_label = {}
-                        data_json_label[u'Author'] = ""
+                        data_json_label[u'Author'] = "Katrin"
                         data_json_label[u'Label'] = "seg-manual"
                         with open(jsonSidecarPath, 'w') as outfile:
                             outfile.write(json.dumps(data_json_label, indent=2, sort_keys=True))
@@ -135,7 +135,7 @@ def main(path_input, path_output):
 
     # Create dataset_description.json
     dataset_description = {"BIDSVersion": "BIDS 1.6.0",
-                           "Name": "ms_seg_mp2rage/INsIDER_SCT_Segmentations_COR"
+                           "Name": "BIDSify INsIDER_SCT_Segmentations_COR"
                            }
 
     with open(path_output + '/dataset_description.json', 'w') as json_file:
@@ -143,7 +143,7 @@ def main(path_input, path_output):
 
     # Create README
     with open(path_output + '/README', 'w') as readme_file:
-        readme_file.write('Dataset for ms_seg_mp2rage/INsIDER_SCT_Segmentations_COR.')
+        readme_file.write('BIDSify MP2RAGE MS SEG dataset: INsIDER_SCT_Segmentations_COR.')
 
 
 if __name__ == "__main__":
