@@ -85,14 +85,14 @@ def main(path_input, path_output):
                     print("Missing: " + jsonSidecarPath)
                     if file.endswith('lesion-manual.nii.gz'):
                         data_json_label = {}
-                        data_json_label[u'Author'] = "Katrin"
+                        data_json_label[u'Author'] = "Tsagkas Charidimos"
                         data_json_label[u'Label'] = "lesion-manual"
                         with open(jsonSidecarPath, 'w') as outfile:
                             outfile.write(json.dumps(data_json_label, indent=2, sort_keys=True))
                         outfile.close()
                     elif file.endswith("seg-manual.nii.gz"):
                         data_json_label = {}
-                        data_json_label[u'Author'] = "Katrin"
+                        data_json_label[u'Author'] = "Tsagkas Charidimos"
                         data_json_label[u'Label'] = "seg-manual"
                         with open(jsonSidecarPath, 'w') as outfile:
                             outfile.write(json.dumps(data_json_label, indent=2, sort_keys=True))
