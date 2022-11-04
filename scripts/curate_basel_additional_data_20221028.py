@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# This script is used to convert a dataset to the BIDS convention. 
+# Dataset: duke:mri/basel/INsIDER_SCT_Segmentations_COR
+# Author: Kiri Stern
+# How to use: XXX
+
 import os
 import shutil
 import json
