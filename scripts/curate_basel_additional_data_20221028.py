@@ -2,7 +2,17 @@
 # This script is used to convert a dataset to the BIDS convention. 
 # Dataset: duke:mri/basel/INsIDER_SCT_Segmentations_COR
 # Author: Kiri Stern
-# How to use: XXX
+# How to use: 
+# -> download `INsIDER_SCT_Segmentations_COR` and `basel-mp2rage` datasets to a common location;
+# ## `INsIDER_SCT_Segmentations_COR` folder contains: `INsIDER_CXXX` or `INsIDER_PXXX` folders
+# ## _CXXX for controls; _PXXX for patients.
+# ## nifti files for each patient are found in their respective folders with the form: `MP2_RAGE_UNI_Images.nii.gz` `MP2RAGE_UNI_Images_seg.nii.gz` or `MP2RAGE_UNI_Images_lesion_Cor_CT.nii.gz`
+# ### _CXXX folders did not contain `MP2RAGE_UNI_Images_lesion_Cor_CT.nii.gz`
+# ## `basel-mp2rage` is in BIDS format
+# -> create a folder (scripts) to store this script
+# # to run script in command line:
+# -> cd to location of this script
+# -> run: python -i ../INsIDER_SCT_Segmentations_COR -o ../bidsify
 
 import os
 import shutil
@@ -11,7 +21,7 @@ import argparse
 
 
 ### make sure not to duplicate same patients from basel_mp2rage 
-other = '../../basel-mp2rage'
+other = '../basel-mp2rage'
 
 dup_patients = []
 for root, dirs, files in os.walk(other, topdown=False):
