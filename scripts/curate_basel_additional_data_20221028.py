@@ -149,7 +149,7 @@ def main(path_input, path_output):
     with open(path_output + '/participants.json', 'w') as json_file:
         json.dump(data_json, json_file, indent=4)
 
-    # Create dataset_description.json
+    # append to  dataset_description.json
     dataset_description = {"BIDSVersion": "BIDS 1.6.0",
                            "Name": "BIDSify INsIDER_SCT_Segmentations_COR"
                            }
@@ -157,9 +157,11 @@ def main(path_input, path_output):
     with open(path_output + '/dataset_description.json', 'w') as json_file:
         json.dump(dataset_description, json_file, indent=4)
 
-    # Create README
-    with open(path_output + '/README', 'w') as readme_file:
-        readme_file.write('BIDSify MP2RAGE MS SEG dataset: INsIDER_SCT_Segmentations_COR.')
+    # append to original README
+    shutil.copy('../basel-mp2rage/README', path_output)
+    
+    with open(path_output+'/README', 'a') as readme_file:
+        readme_file.write('\n\n2022-10-30: Added new data from INsIDER_SCT_Segmentations_COR\nSee repository https://github.com/ivadomed/model_seg_ms_mp2rage')
 
 
 if __name__ == "__main__":
