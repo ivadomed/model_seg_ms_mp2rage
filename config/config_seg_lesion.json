@@ -11,7 +11,7 @@
     "wandb": {
         "wandb_api_key": "9095e2bc9e4ab445d478c9c8a81759ae908be8c6",
         "project_name": "basel-mp2rage-lesion",
-        "group_name": "3D-noAttn-Crop32x64x128-Stride1x1x64",
+        "group_name": "3D-newGT",
         "run_name": "run-01",
         "log_grads_every": 100
     },
