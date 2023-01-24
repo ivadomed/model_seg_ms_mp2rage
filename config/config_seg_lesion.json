@@ -1,7 +1,7 @@
 {
     "command": "train",
     "gpu_ids": [4],
-    "path_output": "/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/model_seg_lesion_mp2rage_",
+    "path_output": "/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/model_seg_lesion_mp2rage_20230102_144854",
     "model_name": "model_seg_lesion_mp2rage",
     "debugging": true,
     "object_detection_params": {
@@ -11,12 +11,12 @@
     "wandb": {
         "wandb_api_key": "9095e2bc9e4ab445d478c9c8a81759ae908be8c6",
         "project_name": "basel-mp2rage-lesion",
-        "group_name": "3D",
-        "run_name": "run-1",
+        "group_name": "3D-noAttn-Crop32x64x128-Stride1x1x64",
+        "run_name": "run-01",
         "log_grads_every": 100
     },
     "loader_parameters": {
-        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20221217_170634/data_processed_lesionseg"],
+        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20221220_124553/data_processed_lesionseg"],
         "subject_selection": {"n": [], "metadata": [], "value": []},
         "target_suffix": ["_lesion-manualHaris"],
         "extensions": [".nii.gz"],
@@ -24,13 +24,13 @@
             "suffix": null,
             "slice_filter_roi": null
         },
-        "contrast_params": {
+	"contrast_params": {
             "training_validation": ["UNIT1"],
             "testing": ["UNIT1"],
             "balance": {}
         },
         "slice_filter_params": {
-            "filter_empty_mask": true,
+            "filter_empty_mask": false,
             "filter_empty_input": true
         },
         "slice_axis": "axial",
@@ -45,7 +45,7 @@
         "data_testing": {"data_type": null, "data_value":[]},
         "balance": null,
         "train_fraction": 0.6,
-        "test_fraction": 0.2
+        "test_fraction": 0.1
     },
     "training_parameters": {
         "batch_size": 16,
@@ -90,8 +90,8 @@
     },
     "Modified3DUNet": {
         "applied": true,
-        "length_3D": [32, 32, 64],
-        "stride_3D": [32, 32, 64],
+        "length_3D": [32, 64, 64],
+        "stride_3D": [1, 1, 64],
         "attention": false,
         "n_filters": 8
     },
@@ -102,7 +102,6 @@
     },
     "postprocessing": {
         "remove_noise": {"thr": -1},
-        "keep_largest": {},
         "binarize_prediction": {"thr": 0.5},
         "uncertainty": {"thr": -1, "suffix": "_unc-vox.nii.gz"},
         "fill_holes": {},
@@ -113,29 +112,8 @@
         "overlap": {"unit": "vox", "thr": 3}
     },
     "transformation": {
-        "Resample":
-        {
-            "hspace": 0.75,
-            "wspace": 0.75,
-            "dspace": 0.75
-        },
-        "CenterCrop": {
-            "size": [64, 64, 128]},
-
-        "RandomAffine": {
-            "degrees": 5,
-            "scale": [0.1, 0.1],
-            "translate": [0.1, 0.1],
-            "applied_to": ["im", "gt"],
-            "dataset_type": ["training"]
-        },
-        "ElasticTransform": {
-            "alpha_range": [28.0, 30.0],
-            "sigma_range":  [3.5, 4.5],
-            "p": 0.1,
-            "applied_to": ["im", "gt"],
-            "dataset_type": ["training"]
-	},		    
+        "Resample": {"hspace": 1, "wspace": 1, "dspace": 1},
+        "CenterCrop": {"size": [32, 64, 128]},
 	"NormalizeInstance": {"applied_to": ["im"]}
     }
 }

@@ -120,7 +120,8 @@ segment_if_does_not_exist ${file} t1 svm
 file_seg="${FILESEG}"
 
 # Dilate spinal cord mask
-sct_maths -i ${file_seg}.nii.gz -dilate 5 -shape ball -o ${file_seg}_dilate.nii.gz
+sct_maths -i ${file_seg}.nii.gz -dilate 2 -shape ball -o ${file_seg}_dilate.nii.gz
+sct_maths -i ${file_seg}_dilate.nii.gz -dilate 32 -dim 1 -shape disk -o ${file_seg}_dilate.nii.gz
 
 # Use dilated mask to crop the original image and manual MS segmentations
 sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
@@ -129,7 +130,7 @@ sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.ni
 cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
 
 # Define variables
-file_gt1="${SUBJECT}_UNIT1_lesion-manualHaris"
+file_gt1="${SUBJECT}_UNIT1_lesion-manualNeuroPoly"
 # Until we figure out a way to inclure more ground truth, we only use manualHaris segmentation.
 # In the future, manualNeuroPoly should be use if it exists.
 #file_gt2="${SUBJECT}_UNIT1_lesion-manual2"
