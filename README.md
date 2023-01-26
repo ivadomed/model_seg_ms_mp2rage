@@ -85,10 +85,15 @@ ivadomed --test -c config/test_on_rater2.json
 ```
 
 Visualize predictions
-TODO: update with variable for path
+
+Update variable below:
 ```
-SUBJECT=017
-julien-macbook:~/temp/rosenberg_nvme $ fsleyes -S ~/data.neuro/basel-mp2rage/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1.nii.gz ~/data.neuro/basel-mp2rage/derivatives/labels/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1_lesion-manualNeuroPoly.nii.gz -cm green model_seg_lesion_mp2rage_20230124_204632/pred_masks/sub-P017_UNIT1_pred.nii.gz -cm red  
+SUBJECT_LIST=(002 017 025 058)
+PATH_MODEL=model_seg_lesion_mp2rage_20230124_204632
+```
+Then launch:
+```
+for SUBJECT in ${SUBJECT_LIST[@]}; do fsleyes -S ~/data.neuro/basel-mp2rage/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1.nii.gz ~/data.neuro/basel-mp2rage/derivatives/labels/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1_lesion-manualNeuroPoly.nii.gz -cm yellow ${PATH_MODEL}/pred_masks/sub-P${SUBJECT}_UNIT1_pred.nii.gz -cm red -a 50; done
 ```
 
 ## Segment a dataset
