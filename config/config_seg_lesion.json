@@ -4,21 +4,18 @@
     "path_output": "/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/model_seg_lesion_mp2rage_20230102_144854",
     "model_name": "model_seg_lesion_mp2rage",
     "debugging": true,
-    "object_detection_params": {
-        "object_detection_path": null,
-        "safety_factor": [1.0, 1.0, 1.0]
-    },
+    "log_file": "train.log",
     "wandb": {
         "wandb_api_key": "9095e2bc9e4ab445d478c9c8a81759ae908be8c6",
         "project_name": "basel-mp2rage-lesion",
-        "group_name": "3D-newGT",
+        "group_name": "r20230127",
         "run_name": "run-01",
         "log_grads_every": 100
     },
     "loader_parameters": {
-        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20221220_124553/data_processed_lesionseg"],
+        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20230124_132415/data_processed_lesionseg"],
         "subject_selection": {"n": [], "metadata": [], "value": []},
-        "target_suffix": ["_lesion-manualHaris"],
+        "target_suffix": ["_lesion-manualNeuroPoly"],
         "extensions": [".nii.gz"],
         "roi_params": {
             "suffix": null,
@@ -44,8 +41,12 @@
         "split_method" : "participant_id",
         "data_testing": {"data_type": null, "data_value":[]},
         "balance": null,
-        "train_fraction": 0.6,
-        "test_fraction": 0.1
+        "train_fraction": 0.8,
+        "test_fraction": 0.0
+    },
+    "object_detection_params": {
+        "object_detection_path": null,
+        "safety_factor": [1.0, 1.0, 1.0]
     },
     "training_parameters": {
         "batch_size": 16,
@@ -93,7 +94,7 @@
         "length_3D": [32, 64, 64],
         "stride_3D": [1, 1, 64],
         "attention": false,
-        "n_filters": 8
+        "n_filters": 16
     },
     "uncertainty": {
         "epistemic": false,
@@ -101,10 +102,8 @@
         "n_it": 0
     },
     "postprocessing": {
-        "remove_noise": {"thr": -1},
+        "remove_noise": {"thr": 0.01},
         "binarize_prediction": {"thr": 0.5},
-        "uncertainty": {"thr": -1, "suffix": "_unc-vox.nii.gz"},
-        "fill_holes": {},
         "remove_small": {"unit": "vox", "thr": 3}
     },
     "evaluation_parameters": {
