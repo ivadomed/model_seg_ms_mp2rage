@@ -64,6 +64,10 @@ Lesion segmentation training was carried out with
 ivadomed --train -c config/seg_lesion.json
 ```
 
+> **Note**
+> See [hyperparameter optimization](https://github.com/ivadomed/model_seg_ms_mp2rage/issues/58)
+
+
 ## Get trained models
 
 ```
