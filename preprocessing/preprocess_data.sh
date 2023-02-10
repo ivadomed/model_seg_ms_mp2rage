@@ -121,7 +121,7 @@ segment_if_does_not_exist ${file} t1 svm
 file_seg="${FILESEG}"
 
 # Use mask to crop the original image 
-sct_crop_image -i ${file}.nii.gz -m ${file_seg}.nii.gz -dilate 3 -o ${file}_crop.nii.gz
+sct_crop_image -i ${file}.nii.gz -m ${file_seg}.nii.gz -dilate 32x2x32 -o ${file}_crop.nii.gz
 
 # Crop the manual MS lesion segmentation
 sct_crop_image -i $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}.nii.gz -m ${file_seg}.nii.gz -dilate 3 -o $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}_crop.nii.gz
