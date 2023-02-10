@@ -1,19 +1,19 @@
 {
     "command": "train",
     "gpu_ids": [4],
-    "path_output": "/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/model_seg_lesion_mp2rage_20230102_144854",
+    "path_output": "/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/model_seg_lesion_mp2rage_",
     "model_name": "model_seg_lesion_mp2rage",
     "debugging": true,
     "log_file": "train.log",
     "wandb": {
         "wandb_api_key": "9095e2bc9e4ab445d478c9c8a81759ae908be8c6",
         "project_name": "basel-mp2rage-lesion",
-        "group_name": "r20230127",
-        "run_name": "seed11",
+        "group_name": "r20230210",
+        "run_name": "seed01",
         "log_grads_every": 100
     },
     "loader_parameters": {
-        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20230124_132415/data_processed_lesionseg"],
+        "path_data": ["/home/GRAMES.POLYMTL.CA/p101317/data_nvme_p101317/data_seg_mp2rage_20230210_144231/data_processed_lesionseg"],
         "subject_selection": {"n": [], "metadata": [], "value": []},
         "target_suffix": ["_lesion-manualNeuroPoly"],
         "extensions": [".nii.gz"],
@@ -37,7 +37,7 @@
     },
     "split_dataset": {
         "fname_split": null,
-        "random_seed": 11,
+        "random_seed": 1,
         "split_method" : "participant_id",
         "data_testing": {"data_type": null, "data_value":[]},
         "balance": null,
