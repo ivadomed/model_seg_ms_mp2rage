@@ -60,10 +60,8 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
     resolutions.append(resolution)
 
     # Read original and cropped subject ground-truths (GT)
-    gt1_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual.nii.gz' % subject)
-    gt1_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual_crop.nii.gz' % subject)
-    gt2_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual2.nii.gz' % subject)
-    gt2_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual2_crop.nii.gz' % subject)
+    gt1_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manualNeuroPoly.nii.gz' % subject)
+    gt1_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manualNeuroPoly_crop.nii.gz' % subject)
 
     gt1 = nib.load(gt1_fpath)
     gt1_crop = nib.load(gt1_crop_fpath)
