@@ -107,6 +107,7 @@ cd ${SUBJECT}/anat
 
 # Define variables
 file="${SUBJECT}_UNIT1"
+file_gt1="${SUBJECT}_UNIT1_lesion-manualNeuroPoly"
 
 # Make sure the image metadata is a valid JSON object
 if [[ ! -s ${file}.json ]]; then
@@ -119,65 +120,22 @@ fi
 segment_if_does_not_exist ${file} t1 svm
 file_seg="${FILESEG}"
 
-# Dilate spinal cord mask
-sct_maths -i ${file_seg}.nii.gz -dilate 2 -shape ball -o ${file_seg}_dilate.nii.gz
-sct_maths -i ${file_seg}_dilate.nii.gz -dilate 32 -dim 1 -shape disk -o ${file_seg}_dilate.nii.gz
+# Use mask to crop the original image 
+sct_crop_image -i ${file}.nii.gz -m ${file_seg}.nii.gz -dilate 3 -o ${file}_crop.nii.gz
 
-# Use dilated mask to crop the original image and manual MS segmentations
-sct_crop_image -i ${file}.nii.gz -m ${file_seg}_dilate.nii.gz -o ${file}_crop.nii.gz
+# Crop the manual MS lesion segmentation
+sct_crop_image -i $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}.nii.gz -m ${file_seg}.nii.gz -dilate 3 -o $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}_crop.nii.gz
 
-# Go to subject folder for segmentation GTs
-cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
-
-# Define variables
-file_gt1="${SUBJECT}_UNIT1_lesion-manualNeuroPoly"
-# Until we figure out a way to inclure more ground truth, we only use manualHaris segmentation.
-# In the future, manualNeuroPoly should be use if it exists.
-#file_gt2="${SUBJECT}_UNIT1_lesion-manual2"
-#file_gtc="${SUBJECT}_UNIT1_lesion-manual-majvote"
-#file_soft="${SUBJECT}_UNIT1_lesion-manual-soft"
-# 'c' stands for the consensus GT
-
-# Redefine variable for final SC segmentation mask as path changed
-file_seg_dil=${PATH_DATA_PROCESSED}/${SUBJECT}/anat/${file_seg}_dilate
-
-# Make sure the first rater metadata is a valid JSON object
-if [[ ! -s ${file_gt1}.json ]]; then
-  echo "{}" >> ${file_gt1}.json
+# Make sure a JSON file is present, if not create an empty one
+if [[ ! -s $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}.json ]]; then
+  echo "{}" >> $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat/${file_gt1}.json
 fi
-
-# Aggregate multiple raters if second rater is present
-#if [[ -f ${file_gt2}.nii.gz ]]; then
-  # Make sure the second rater metadata is a valid JSON object
-#  if [[ ! -s ${file_gt2}.json ]]; then
-#    echo "{}" >> ${file_gt2}.json
-#  fi
-  # Create consensus ground truth by majority vote
-#  sct_maths -i ${file_gt1}.nii.gz -add ${file_gt2}.nii.gz -o lesion_sum.nii.gz
-#  sct_maths -i lesion_sum.nii.gz -sub 1 -o lesion_sum_minusone.nii.gz
-  # binarize: everything that is 0.5 and below 0.5 becomes 0.
-#  sct_maths -i lesion_sum_minusone.nii.gz -thr 0.5 -o ${file_gtc}.nii.gz
-
-  # Create soft ground truth by averaging all raters
-#  sct_maths -i lesion_sum.nii.gz -div 2 -o ${file_soft}.nii.gz
-
-  # Crop the manual segs
-#  sct_crop_image -i ${file_gt2}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt2}_crop.nii.gz
-#  sct_crop_image -i ${file_gtc}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gtc}_crop.nii.gz
-#  sct_crop_image -i ${file_soft}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_soft}_crop.nii.gz
-#fi
-
-# Crop the manual seg
-sct_crop_image -i ${file_gt1}.nii.gz -m ${file_seg_dil}.nii.gz -o ${file_gt1}_crop.nii.gz
-
-# Go back to the root output path
-cd $PATH_OUTPUT
 
 # Create clean data processed folders for two tasks: spinal cord (SC) segmentation and lesion segmentation
 PATH_DATA_PROCESSED_SCSEG="${PATH_DATA_PROCESSED}_scseg"
 PATH_DATA_PROCESSED_LESIONSEG="${PATH_DATA_PROCESSED}_lesionseg"
 
-# Copy over required BIDs files to both folders
+# Copy over required BIDS files to both folders
 mkdir -p $PATH_DATA_PROCESSED_SCSEG $PATH_DATA_PROCESSED_SCSEG/${SUBJECT} $PATH_DATA_PROCESSED_SCSEG/${SUBJECT}/anat
 mkdir -p $PATH_DATA_PROCESSED_LESIONSEG $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/${SUBJECT}/anat
 rsync -avzh $PATH_DATA_PROCESSED/dataset_description.json $PATH_DATA_PROCESSED_SCSEG/
@@ -208,15 +166,6 @@ rsync -avzh $PATH_DATA_PROCESSED/${SUBJECT}/anat/${file}.json $PATH_DATA_PROCESS
 mkdir -p $PATH_DATA_PROCESSED_LESIONSEG/derivatives $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT} $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/
 rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.nii.gz
 rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt1}.json
-# If second rater is present, copy the other files
-#if [[ -f ${PATH_DATA_PROCESSED}/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz ]]; then
-  # Copy the second rater GT and aggregated GTs if second rater is present
-#  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.nii.gz
-#  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gt2}.json
-#  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_gtc}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_gtc}.nii.gz
-#  rsync -avzh $PATH_DATA_PROCESSED/derivatives/labels/${SUBJECT}/anat/${file_soft}_crop.nii.gz $PATH_DATA_PROCESSED_LESIONSEG/derivatives/labels/${SUBJECT}/anat/${file_soft}.nii.gz
-#fi
-
 
 # Display useful info for the log
 end=`date +%s`
