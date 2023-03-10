@@ -7,6 +7,8 @@ This repository contains two models, one for spinal cord (SC) segmentation and o
 
 ![model_overview](https://github.com/ivadomed/model_seg_ms_mp2rage/releases/download/r20211223/model_overview.png)
 
+As of https://github.com/ivadomed/model_seg_ms_mp2rage/releases/tag/r20230210, five models are trained (with dropout and different seeds), to perform ensemble/bagging during inference and compute epistemic uncertainty.
+
 ## Dependencies
 
 - [SCT](https://spinalcordtoolbox.com/) commit: 7fd2ea718751dd858840c3823c0830a910d9777c
@@ -100,14 +102,12 @@ Then launch:
 for SUBJECT in ${SUBJECT_LIST[@]}; do fsleyes -S ~/data.neuro/basel-mp2rage/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1.nii.gz ~/data.neuro/basel-mp2rage/derivatives/labels/sub-P${SUBJECT}/anat/sub-P${SUBJECT}_UNIT1_lesion-manualNeuroPoly.nii.gz -cm yellow ${PATH_MODEL}/pred_masks/sub-P${SUBJECT}_UNIT1_pred.nii.gz -cm red -a 50; done
 ```
 
-## Segment a dataset
+## Segment an image
 
-To run inference with spinal cord segmentation model on a dataset run
+To run inference:
 ```
-ivadomed --segment -c config/seg_sc.json --path-data <PATH_DATA>
+ivadomed_segment_image -i IMAGE -m MODEL
 ```
 
-To run inference with lesion segmentation model on a dataset run
-```
-ivadomed --segment -c config/seg_lesion.json --path-data <PATH_DATA>
-```
+> **Warning**
+> When running the MS lesion segmentation model, the image first need to be cropped around the spinal cord with a dilation of 32 in the axial plane.
