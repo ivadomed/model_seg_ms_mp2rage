@@ -34,6 +34,7 @@ resolutions, sizes, crop_sizes = [], [], []
 
 # Log problematic subjects for QC
 failed_crop_subjects, shape_mismatch_subjects, left_out_lesion_subjects = [], [], []
+no_groundtruth = []
 
 # Perform QC on each subject
 for subject in tqdm(subjects, desc='Iterating over Subjects'):
@@ -60,30 +61,28 @@ for subject in tqdm(subjects, desc='Iterating over Subjects'):
     resolutions.append(resolution)
 
     # Read original and cropped subject ground-truths (GT)
-    gt1_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual.nii.gz' % subject)
-    gt1_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual_crop.nii.gz' % subject)
-    gt2_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual2.nii.gz' % subject)
-    gt2_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manual2_crop.nii.gz' % subject)
+    gt1_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manualNeuroPoly.nii.gz' % subject)
+    if not os.path.exists(gt1_fpath):
+        no_groundtruth.append(subject)
+        continue
+    gt1_crop_fpath = os.path.join(subject_labels_path, '%s_UNIT1_lesion-manualNeuroPoly_crop.nii.gz' % subject)
 
     gt1 = nib.load(gt1_fpath)
     gt1_crop = nib.load(gt1_crop_fpath)
-    gt2 = nib.load(gt2_fpath)
-    gt2_crop = nib.load(gt2_crop_fpath)
 
     # Basic shape checks
-    if not img_crop.shape == gt1_crop.shape == gt2_crop.shape:
+    if not img_crop.shape == gt1_crop.shape:
         shape_mismatch_subjects.append(subject)
         continue
 
     # Check if the dilated SC mask leaves out any lesions from GTs (from each rater)
-    if not (np.allclose(np.sum(gt1.get_fdata()), np.sum(gt1_crop.get_fdata())) and
-            np.allclose(np.sum(gt2.get_fdata()), np.sum(gt2_crop.get_fdata()))):
+    if not (np.allclose(np.sum(gt1.get_fdata()), np.sum(gt1_crop.get_fdata()))):
         left_out_lesion_subjects.append(subject)
 
 print('RESOLUTIONS: ', Counter(resolutions))
 print('SIZES: ', Counter(sizes))
 print('CROP SIZES: ', Counter(crop_sizes))
-
+print('List of missing ground truth: ', no_groundtruth)
 print('Could not find cropped image for the following subjects: ', failed_crop_subjects)
 print('Found shape mismatch in images and GTs for the following subjects: ', shape_mismatch_subjects)
 print('ALERT: Lesion(s) from raters cropped during preprocessing for the following subjects: ', left_out_lesion_subjects)
