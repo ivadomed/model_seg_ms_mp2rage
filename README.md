@@ -111,3 +111,7 @@ ivadomed_segment_image -i IMAGE -m MODEL
 
 > **Warning**
 > When running the MS lesion segmentation model, the image first need to be cropped around the spinal cord with a dilation of 32 in the axial plane.
+
+## Ensemble
+
+Multiple models were trained with different seeds, and they can all be used at test-time to produce slightly different segmentations that can then be everaged (ensemble/bagging). See more details [here](https://github.com/ivadomed/model_seg_ms_mp2rage/issues/63#issuecomment-1409250538).
