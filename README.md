@@ -1,5 +1,7 @@
 # model_seg_ms_mp2rage
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8376754.svg)](https://doi.org/10.5281/zenodo.8376754)
+
 Model repository for MS lesion segmentation on MP2RAGE data as discussed [here](https://github.com/ivadomed/ivadomed/issues/821).
 This repository contains two models, one for spinal cord (SC) segmentation and one for MS lesion segmentation.
 
