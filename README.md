@@ -9,8 +9,7 @@ Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 3D model trained with [nnUNetv2](https://github.com/MIC-DKFZ/nnUNet) framework.
 
 ## Dependencies
-
-- [SCT 6.3](https://spinalcordtoolbox.com/)
+[SCT 6.3](https://spinalcordtoolbox.com/)
 
 ## Datasets for training 
 
@@ -26,17 +25,20 @@ sct_deepseg -install-task seg_sc_contrast_agnostic
 sct_deepseg -install-task seg_ms_lesion_mp2rage 
 ```
 
-**Warning**
-When running the MS lesion segmentation model, the image first need to be cropped around the spinal cord mask with a dilation of 30 mm in the axial plane and 5 mm in the Z-axis. 
+**Warning:** When running the MS lesion segmentation model, the image first need to be cropped around the spinal cord mask with a dilation of 30 mm in the axial plane and 5 mm in the Z-axis. 
 
-## Launch segmentations:
-### Spinal cord segmentation 
+## Launch MS lesion segmentation:
+1. Spinal cord segmentation 
 ```bash
-sct_deepseg -i IMAGE_UNIT1 -task seg_sc_contrast_agnostic
+sct_deepseg -i IMAGE_UNIT1 -task seg_sc_contrast_agnostic -o IMAGE_UNIT1_sc
 ```
-### MS lesion segmentation 
+2. Cropping with dilation
 ```bash
-sct_deepseg -i IMAGE_UNIT1 -task seg_ms_lesion_mp2rage 
+sct_crop_image -i IMAGE_UNIT1 -m IMAGE_UNIT1_sc -dilate 30x30x5 -o IMAGE_UNIT1_cropped
+```
+3. MS lesion segmentation 
+```bash
+sct_deepseg -i IMAGE_UNIT1_cropped -task seg_ms_lesion_mp2rage 
 ```
 
 ## Acknowledgments
