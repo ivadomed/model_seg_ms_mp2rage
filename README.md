@@ -32,7 +32,7 @@ sct_deepseg -install-task seg_ms_lesion_mp2rage
 ```bash
 sct_deepseg -i IMAGE_UNIT1 -task seg_sc_contrast_agnostic -o IMAGE_UNIT1_sc
 ```
-2. Cropping with dilation
+2. Cropping with dilation (for images with 1mm isotropic resolution)
 ```bash
 sct_crop_image -i IMAGE_UNIT1 -m IMAGE_UNIT1_sc -dilate 30x30x5 -o IMAGE_UNIT1_cropped
 ```
