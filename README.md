@@ -43,4 +43,7 @@ sct_deepseg -i IMAGE_UNIT1_cropped -task seg_ms_lesion_mp2rage
 
 ## Acknowledgments
 
-Charidimos Tsagkas and Daniel Reich from Translational Neuroradiology Section, National Institutes of Health (NIH), Bethesda, USA, Cristina Granziera from Neurologic Clinic and Policlinic, University Hospital Basel and University of Basel, Basel, Switzerland and Virginie Callot from Center for Magnetic Resonance in Biology and Medicine (CRMBM-CEMEREM, UMR 7339, CNRS, Aix-Marseille University, Marseille, France).
+- Charidimos Tsagkas (Translational Neuroradiology Section, National Institutes of Health, Bethesda, USA)
+- Daniel Reich (Translational Neuroradiology Section, National Institutes of Health, Bethesda, USA)
+- Cristina Granziera (Neurologic Clinic and Policlinic, University Hospital Basel and University of Basel, Basel, Switzerland)
+- Virginie Callot (Center for Magnetic Resonance in Biology and Medicine, CRMBM-CEMEREM, UMR 7339, CNRS, Aix-Marseille University, Marseille, France)
