@@ -9,7 +9,7 @@ Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 3D model trained with [nnUNetv2](https://github.com/MIC-DKFZ/nnUNet) framework.
 
 ## Dependencies
-[SCT 6.3](https://spinalcordtoolbox.com/)
+[SCT 6.4](https://spinalcordtoolbox.com/)
 
 ## Datasets for training 
 
