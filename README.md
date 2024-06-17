@@ -45,8 +45,6 @@ sct_deepseg -i IMAGE_UNIT1_cropped -task seg_ms_lesion_mp2rage
 
 1. Install [3D Slicer version 5.7.0](https://download.slicer.org/), then install the module [SlicerNNUnet](https://github.com/KitwareMedical/SlicerNNUnet) from the extensions explorer.
 
-**Fig.01**
-
 <img src="https://github.com/spinalcordtoolbox/spinalcordtoolbox/assets/77469192/9d7964d2-66e3-464d-ac1a-04caaaced63b" width="300px;" alt=""/>
 
 
