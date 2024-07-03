@@ -48,36 +48,25 @@ sct_deepseg -i IMAGE_UNIT1_cropped -task seg_ms_lesion_mp2rage
 <img src="https://github.com/spinalcordtoolbox/spinalcordtoolbox/assets/77469192/9d7964d2-66e3-464d-ac1a-04caaaced63b" width="300px;" alt=""/>
 
 
-2. Download and unzip the [model_seg_ms_mp2rage model release r20240610](https://github.com/ivadomed/model_seg_ms_mp2rage/releases/tag/r20240610) ( `.zip` file ~120 Mb)
+2. Download and unzip the [ nnUNetTrainer_seg_ms_lesion_mp2rage__nnUNetPlans__3d_fullres.zip](https://github.com/ivadomed/model_seg_ms_mp2rage/releases/tag/r20240610) file. (~120 Mb)
 
-3.  Reorganize the downloaded folder: from `Native` to `Slicer friendly arborescence` 
-
-Native arborescence:
+3. Unzip the `.zip` file and place it inside a folder named `Dataset403_seg_ms_lesion_mp2rage_1mm_322subj`. The final directory structure should look like this:
 ```
-model_ms_lesion_mp2rage-unit1_3d/
-├── dataset_fingerprint.json
-├── dataset.json
-├── fold_3
-│   ├── checkpoint_best.pth
-│   ├── debug.json
-│   ├── progress.png
-│   └── training_log_2024_3_14_20_35_08.txt
-├── plans.json
-└── source.json 
-``` 
-
-Slicer friendly  arborescence 
-```
-Dataset403_seg_ms_lesion_mp2rage_1mm_322subj/
-└── nnUNetTrainer_seg_ms_lesion_mp2rage_nnUNetPlans_3d_fullres
+Dataset403_seg_ms_lesion_mp2rage_1mm_322subj
+└── nnUNetTrainer_seg_ms_lesion_mp2rage__nnUNetPlans__3d_fullres
     ├── dataset_fingerprint.json
     ├── dataset.json
+    ├── dataset_split.md
+    ├── datasplits
+    │   ├── datasplit_basel-mp2rage.yaml
+    │   ├── datasplit_marseille-3t-mp2rage.yaml
+    │   └── datasplit_nih-ms-mp2rage.yaml
     ├── fold_3
     │   ├── checkpoint_final.pth
     │   ├── debug.json
     │   ├── progress.png
     │   └── training_log_2024_3_14_20_35_08.txt
-    └── plans.json 
+    └── plans.json
 ``` 
 
 4. nnUNet Install: Follow the instructions on first row of:
