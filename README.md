@@ -1,4 +1,5 @@
 # model_seg_ms_mp2rage
+[![release zenodo](https://img.shields.io/badge/zenodo-records/11555780-blue)](https://zenodo.org/records/11555780)
 
 Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 
@@ -10,10 +11,6 @@ Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 
 ## Dependencies
 [![SCT](https://img.shields.io/badge/SCT-6.4-green)](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4)
-
-## Previous version
-[![release zenodo](https://img.shields.io/badge/zenodo-records/11555780-blue)](https://zenodo.org/records/11555780)
-[![release r20230310](https://img.shields.io/badge/release-r20230310-blue)](https://github.com/ivadomed/model_seg_ms_mp2rage/releases/tag/r20230310)
 
 ## Datasets for training 
 
