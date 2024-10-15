@@ -84,3 +84,9 @@ Dataset403_seg_ms_lesion_mp2rage_1mm_322subj
 - Daniel Reich (Translational Neuroradiology Section, National Institutes of Health, Bethesda, USA)
 - Cristina Granziera (Neurologic Clinic and Policlinic, University Hospital Basel and University of Basel, Basel, Switzerland)
 - Virginie Callot (Center for Magnetic Resonance in Biology and Medicine, CRMBM-CEMEREM, UMR 7339, CNRS, Aix-Marseille University, Marseille, France)
+ 
+## How to cite
+Laines Medina N, Mchinda S, Testud B, Demortière S, Chen M, Granziera G, Reich D, Tsagkas C, Cohen-Adad J and Callot V.	[Automatic Multiple Sclerosis Lesion Segmentation in the Spinal Cord on 3T and 7T MP2RAGE images](https://github.com/user-attachments/files/17374804/POSTERS-E.ESMRMB.2024.NILSER.LAINES.MEDINA.pdf), in: Proceedings of the 40th Annual Scientific Meeting of ESMRMB	Barcelona, Spain	2024	p171.
+
+
+
