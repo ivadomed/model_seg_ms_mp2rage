@@ -1,4 +1,4 @@
-# model_seg_ms_mp2rage
+# Automatic MS lesion segmentation on MP2RAGE-UNI images
 [![release zenodo](https://img.shields.io/badge/zenodo-records/11555780-blue)](https://zenodo.org/records/11555780)
 
 Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
@@ -10,7 +10,7 @@ Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 3D model trained with [nnUNetv2](https://github.com/MIC-DKFZ/nnUNet) framework.
 
 ## Dependencies
-[![SCT](https://img.shields.io/badge/SCT-6.4-green)](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4)
+[![SCT](https://img.shields.io/badge/SCT-7.0-green)](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/7.0)
 
 ## Datasets for training 
 
@@ -20,10 +20,10 @@ Model repository for MS lesion segmentation on MP2RAGE data (UNIT1 contrast)
 
 ## Installation 
 ```bash
-sct_deepseg -install-task seg_sc_contrast_agnostic
+sct_deepseg spinalcord -install
 ```
 ```bash
-sct_deepseg -install-task seg_ms_lesion_mp2rage 
+sct_deepseg lesion_ms_mp2rage -install 
 ```
 
 :warning: **Warning:** When running the MS lesion segmentation model, the image first need to be cropped around the spinal cord mask with a dilation of 30 mm in the axial plane and 5 mm in the Z-axis. 
@@ -31,7 +31,7 @@ sct_deepseg -install-task seg_ms_lesion_mp2rage
 ## Launch MS lesion segmentation:
 1. Spinal cord segmentation 
 ```bash
-sct_deepseg -i IMAGE_UNIT1 -task seg_sc_contrast_agnostic -o IMAGE_UNIT1_sc
+sct_deepseg spinalcord -i IMAGE_UNIT1 -o IMAGE_UNIT1_sc
 ```
 2. Cropping with dilation (for axial orientation images with 1mm isotropic resolution)
 ```bash
@@ -39,7 +39,7 @@ sct_crop_image -i IMAGE_UNIT1 -m IMAGE_UNIT1_sc -dilate 30x30x5 -o IMAGE_UNIT1_c
 ```
 3. MS lesion segmentation 
 ```bash
-sct_deepseg -i IMAGE_UNIT1_cropped -task seg_ms_lesion_mp2rage 
+sct_deepseg lesion_ms_mp2rage -i IMAGE_UNIT1_cropped 
 ```
 
 ## Model implementation on Slicer
